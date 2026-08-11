@@ -1,0 +1,59 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-background text-textPrimary font-sans antialiased min-h-screen overflow-x-hidden;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-display tracking-tight;
+  }
+}
+
+@layer utilities {
+  .glass {
+    @apply bg-[#111827]/70 backdrop-blur-xl border border-white/10 shadow-lg;
+  }
+  
+  .glass-elevated {
+    @apply bg-[#182235]/80 backdrop-blur-2xl border border-white/20 shadow-2xl;
+  }
+
+  .glow-primary {
+    @apply shadow-[0_0_20px_rgba(124,92,255,0.4)];
+  }
+
+  .glow-secondary {
+    @apply shadow-[0_0_20px_rgba(0,212,255,0.4)];
+  }
+
+  .glow-success {
+    @apply shadow-[0_0_20px_rgba(34,197,94,0.4)];
+  }
+
+  .glow-danger {
+    @apply shadow-[0_0_20px_rgba(239,68,68,0.4)];
+  }
+
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+  }
+  
+  .animate-float {
+    animation: float 6s ease-in-out infinite;
+  }
+
+  @keyframes float-slow {
+    0%, 100% { transform: translateY(0) scale(1); }
+    50% { transform: translateY(-20px) scale(1.05); }
+  }
+  
+  .animate-float-slow {
+    animation: float-slow 10s ease-in-out infinite;
+  }
+}
