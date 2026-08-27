@@ -1,5 +1,16 @@
-import { createContext, useContext, useState } from 'react';
+/* eslint-disable react-refresh/only-export-components */
+import { createContext, useContext, useState, useEffect } from 'react';
+import { mockAuthApi } from './mockAuthApi';
 import type { ReactNode } from 'react';
+
+export type Player = {
+  userId: string;
+  displayName: string;
+  email: string;
+  avatarId: string;
+};
+
+// Backend acts as the single source of truth now. DEMO_USERS are migrated to SQLite.
 
 type Achievement = {
   id: string;
@@ -16,7 +27,19 @@ export type ToastMessage = {
   type: 'reward' | 'info' | 'success';
 };
 
+export type District = {
+  id: string;
+  name: string;
+  description: string;
+  progress: string;
+  reward: string;
+  path: string;
+  locked: boolean;
+};
+
 type GameState = {
+  user: Player | null;
+  money: number;
   level: number;
   xp: number;
   nextLevelXp: number;
@@ -26,6 +49,11 @@ type GameState = {
   achievements: Achievement[];
   missions: Mission[];
   toasts: ToastMessage[];
+  districts: District[];
+  login: (userId: string, password?: string) => Promise<boolean>;
+  register: (displayName: string, email: string, password?: string, ageConfirm?: boolean) => Promise<boolean>;
+  logout: () => void;
+  updateMoney: (delta: number) => void;
   addXp: (amount: number) => void;
   levelUp: () => void;
   unlockAchievement: (id: string) => void;
@@ -39,12 +67,87 @@ type GameState = {
 const GameStateContext = createContext<GameState | undefined>(undefined);
 
 export const GameStateProvider = ({ children }: { children: ReactNode }) => {
+  const [user, setUser] = useState<Player | null>(null);
+  const [money, setMoney] = useState(245000);
   const [level, setLevel] = useState(18);
   const [xp, setXp] = useState(4820);
   const [nextLevelXp, setNextLevelXp] = useState(5500);
   const [health, setHealth] = useState(78);
-  const [streakDays] = useState(12);
+  const [streakDays, setStreakDays] = useState(12);
   const [netWorth, setNetWorth] = useState(248500);
+
+  // Sync from backend
+  const syncState = async () => {
+    try {
+      const res = await fetch('/api/player/me');
+      if (res.ok) {
+        const data = await res.json();
+        setUser(data.player);
+        setLevel(data.state.level);
+        setXp(data.state.xp);
+        setMoney(data.state.money);
+        setNetWorth(data.state.netWorth);
+        setHealth(data.state.health);
+        setStreakDays(data.state.streakDays);
+        // Note: achievements and unlockedDistricts can also be updated here
+      } else {
+        // If unauthorized, clear user
+        if (res.status === 401) {
+          setUser(null);
+        }
+      }
+    } catch (e) {
+      console.error("Failed to sync state from backend", e);
+    }
+  };
+
+  // Initial sync and polling
+  useEffect(() => {
+    syncState(); // Check if already logged in via cookie on mount
+    
+    // Poll every 5 seconds to get updates from Admin
+    const interval = setInterval(syncState, 5000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const login = async (userId: string, password?: string): Promise<boolean> => {
+    try {
+      const res = await fetch('/api/player/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId, password })
+      });
+      if (res.ok) {
+        await syncState();
+        return true;
+      }
+    } catch (e) {
+      console.error(e);
+    }
+    return false;
+  };
+
+  const register = async (displayName: string, email: string, password?: string, ageConfirm?: boolean): Promise<boolean> => {
+    const res = await mockAuthApi.register({ displayName, email, password, ageConfirmation: !!ageConfirm });
+    if (res.success && res.userId) {
+      // Mock log in immediately
+      setUser({ userId: res.userId, displayName, email, avatarId: 'avatar_01' });
+      setLevel(1);
+      setXp(0);
+      setMoney(10000); // Default cash
+      setNetWorth(10000);
+      setHealth(100);
+      return true;
+    }
+    return false;
+  };
+
+  const logout = async () => {
+    try {
+      await fetch('/api/player/logout', { method: 'POST' });
+    } catch (e) {}
+    setUser(null);
+  };
 
   const [achievements, setAchievements] = useState<Achievement[]>([
     { id: 'first', name: 'First Investment', unlocked: true },
@@ -58,6 +161,18 @@ export const GameStateProvider = ({ children }: { children: ReactNode }) => {
     { id: 'inflation', title: 'Understanding Inflation', reward: 250, completed: false },
     { id: 'diversify', title: 'Diversify Portfolio', reward: 500, completed: false },
     { id: 'weekly', title: 'Weekly Challenge', reward: 1000, completed: false },
+    { id: 'study_stocks', title: 'Stock Explorer', reward: 150, completed: false },
+    { id: 'study_bonds', title: 'Bond Builder', reward: 150, completed: false },
+  ]);
+
+  const [districts] = useState<District[]>([
+    { id: 'study', name: 'Study 🎓', description: 'Understand money. Make smarter decisions. Build your world.', progress: '0%', reward: '+XP', path: '/study', locked: false },
+    { id: 'academy', name: 'Fin Academy', description: 'Learn how money works.', progress: '80%', reward: '+250 XP', path: '/academy', locked: false },
+    { id: 'investment', name: 'Investment District', description: 'Grow your wealth through smart decisions.', progress: '20%', reward: '+500 XP', path: '/investment', locked: false },
+    { id: 'market', name: 'Market City', description: 'Experience supply, demand, and economics.', progress: 'Locked', reward: 'Level 20 Req', path: '/market', locked: true },
+    { id: 'life', name: 'Life Hub', description: 'Build your life, set goals, and thrive.', progress: '50%', reward: '+100 XP', path: '/life', locked: false },
+    { id: 'security', name: 'Security Center', description: 'Spot frauds, earn badges, stay safe.', progress: '0%', reward: 'Fraud Spotter Badge', path: '/security', locked: false },
+    { id: 'social', name: 'Social Hub', description: 'Connect, compete, and show off your progress.', progress: 'Active', reward: 'Rank #24', path: '/social', locked: false },
   ]);
 
   const [toasts, setToasts] = useState<ToastMessage[]>([]);
@@ -128,10 +243,16 @@ export const GameStateProvider = ({ children }: { children: ReactNode }) => {
 
   const updateHealth = (value: number) => setHealth(value);
   const updateNetWorth = (delta: number) => setNetWorth((prev) => prev + delta);
+  const updateMoney = (delta: number) => setMoney((prev) => prev + delta);
 
   return (
     <GameStateContext.Provider
       value={{
+        user,
+        login,
+        register,
+        logout,
+        money,
         level,
         xp,
         nextLevelXp,
@@ -141,12 +262,14 @@ export const GameStateProvider = ({ children }: { children: ReactNode }) => {
         achievements,
         missions,
         toasts,
+        districts,
         addXp,
         levelUp,
         unlockAchievement,
         completeMission,
         updateHealth,
         updateNetWorth,
+        updateMoney,
         showToast,
         removeToast,
       }}

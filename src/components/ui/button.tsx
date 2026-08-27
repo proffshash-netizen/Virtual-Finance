@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components */
 import * as React from "react"
 import { Slot } from "@radix-ui/react-slot"
 import { cva, type VariantProps } from "class-variance-authority"
@@ -9,15 +10,15 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
-        default: "bg-primary text-textPrimary hover:bg-primary/90 glow-primary",
-        destructive: "bg-danger text-textPrimary hover:bg-danger/90",
-        outline: "border border-border bg-transparent hover:bg-surface text-textPrimary hover:border-primary/50",
+        default: "bg-primary text-text-primary hover:bg-primary/90 glow-primary",
+        destructive: "bg-danger text-text-primary hover:bg-danger/90",
+        outline: "border border-border bg-transparent hover:bg-surface text-text-primary hover:border-primary/50",
         secondary: "bg-secondary text-[#080B14] hover:bg-secondary/90 glow-secondary",
-        ghost: "hover:bg-surface hover:text-textPrimary",
+        ghost: "hover:bg-surface hover:text-text-primary",
         link: "text-primary underline-offset-4 hover:underline",
-        glass: "glass hover:bg-white/5 text-textPrimary hover:border-primary/50 shadow-md",
+        glass: "glass hover:bg-white/5 text-text-primary hover:border-primary/50 shadow-md",
         reward: "bg-reward text-[#080B14] hover:bg-reward/90 shadow-[0_0_20px_rgba(245,185,66,0.4)]",
-        success: "bg-success text-textPrimary hover:bg-success/90 shadow-[0_0_20px_rgba(34,197,94,0.4)]",
+        success: "bg-success text-text-primary hover:bg-success/90 shadow-[0_0_20px_rgba(34,197,94,0.4)]",
       },
       size: {
         default: "h-10 px-4 py-2",

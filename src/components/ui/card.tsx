@@ -9,7 +9,7 @@ const Card = React.forwardRef<
   <div
     ref={ref}
     className={cn(
-      "rounded-xl border border-border text-textPrimary transition-all duration-300 hover:scale-105 hover:shadow-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2",
+      "rounded-xl border border-border text-text-primary transition-all duration-300 hover:scale-105 hover:shadow-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2",
       glass ? "glass" : "bg-surface",
       glow === 'primary' && "glow-primary border-primary/30",
       glow === 'secondary' && "glow-secondary border-secondary/30",
@@ -53,7 +53,7 @@ const CardDescription = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <p
     ref={ref}
-    className={cn("text-sm text-textSecondary", className)}
+    className={cn("text-sm text-text-secondary", className)}
     {...props}
   />
 ))

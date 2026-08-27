@@ -1,356 +1,344 @@
 import { useState, useEffect } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  TrendingUp, Activity, Lock, Wallet, PieChart, 
-  Coins, Pickaxe, ShieldCheck, X, CheckCircle, 
-  BarChart4, ArrowUpRight, ArrowDownRight, Layers
-} from 'lucide-react';
-import { Card, CardHeader, CardTitle, CardContent } from '../components/ui/card';
-import { Button } from '../components/ui/button';
-import { Badge } from '../components/ui/badge';
 import { useGameState } from '../lib/gameState';
-import { cn } from '../lib/utils';
-import { AnimatedNumber } from '../components/ui/AnimatedNumber';
-
-type Asset = {
-  id: string;
-  name: string;
-  icon: React.ElementType;
-  value: string;
-  return: string;
-  isPositive: boolean;
-  risk: 'Low' | 'Medium' | 'High';
-  isLocked: boolean;
-  color: string;
-};
-
-const assets: Asset[] = [
-  { id: 'stocks', name: 'Stocks', icon: Activity, value: '₹1,04,370', return: '+8.4%', isPositive: true, risk: 'High', isLocked: false, color: 'text-primary' },
-  { id: 'mf', name: 'Mutual Funds', icon: PieChart, value: '₹69,580', return: '+12.1%', isPositive: true, risk: 'Medium', isLocked: false, color: 'text-success' },
-  { id: 'etf', name: 'ETFs', icon: Layers, value: '₹0', return: '0.0%', isPositive: true, risk: 'Medium', isLocked: true, color: 'text-textSecondary' },
-  { id: 'gold', name: 'Gold', icon: Coins, value: '₹37,275', return: '+4.2%', isPositive: true, risk: 'Low', isLocked: false, color: 'text-reward' },
-  { id: 'fd', name: 'Fixed Deposits', icon: ShieldCheck, value: '₹24,850', return: '+6.5%', isPositive: true, risk: 'Low', isLocked: false, color: 'text-secondary' },
-  { id: 'rd', name: 'Recurring Deposits', icon: Wallet, value: '₹0', return: '0.0%', isPositive: true, risk: 'Low', isLocked: true, color: 'text-textSecondary' },
-  { id: 'ppf', name: 'PPF', icon: ShieldCheck, value: '₹0', return: '0.0%', isPositive: true, risk: 'Low', isLocked: true, color: 'text-textSecondary' },
-  { id: 'crypto', name: 'Crypto Sandbox', icon: Pickaxe, value: '₹0', return: '0.0%', isPositive: true, risk: 'High', isLocked: true, color: 'text-textSecondary' },
-];
-
-const allocation = [
-  { label: 'Equity', percent: 42, color: 'bg-primary', shadow: 'shadow-[0_0_10px_rgba(124,92,255,0.8)]' },
-  { label: 'Mutual Funds', percent: 28, color: 'bg-success', shadow: 'shadow-[0_0_10px_rgba(34,197,94,0.8)]' },
-  { label: 'Gold', percent: 15, color: 'bg-reward', shadow: 'shadow-[0_0_10px_rgba(245,185,66,0.8)]' },
-  { label: 'Fixed Deposits', percent: 10, color: 'bg-secondary', shadow: 'shadow-[0_0_10px_rgba(0,212,255,0.8)]' },
-  { label: 'Cash', percent: 5, color: 'bg-white', shadow: 'shadow-[0_0_10px_rgba(255,255,255,0.8)]' },
-];
+import { mockPortfolioApi } from '../lib/mockPortfolioApi';
+import type { PortfolioData, Instrument, TierType } from '../lib/mockPortfolioApi';
+import { Shield, TrendingUp, AlertTriangle, ArrowUpRight, ArrowDownRight, ArrowLeft } from 'lucide-react';
+import { Button } from '../components/ui/button';
+import { useNavigate } from 'react-router-dom';
 
 export function InvestmentDistrict() {
   const navigate = useNavigate();
-  const location = useLocation();
-  const { netWorth, updateNetWorth, unlockAchievement, health, completeMission } = useGameState();
-  
-  const [selectedAsset, setSelectedAsset] = useState<Asset | null>(null);
-  const [purchaseState, setPurchaseState] = useState<'idle' | 'processing' | 'success'>('idle');
-  const [mockChange, setMockChange] = useState(4280);
+  const { user, money, updateMoney, updateNetWorth } = useGameState();
+  const [portfolio, setPortfolio] = useState<PortfolioData | null>(null);
+  const [activeTab, setActiveTab] = useState<TierType>('foundation');
+  const [loading, setLoading] = useState(true);
+  const [selectedInstrument, setSelectedInstrument] = useState<{ tier: TierType, instrument: Instrument } | null>(null);
+  const [investAmount, setInvestAmount] = useState('');
+  const [investing, setInvesting] = useState(false);
+  const [investError, setInvestError] = useState('');
 
-  // If arriving from Market City, simulate a temporary dip visually
+  // Fallback user id if not logged in for mock purposes
+  const userId = user?.userId || 'mock_user_1';
+
   useEffect(() => {
-    if (location.state?.portfolioImpacted) {
-      setMockChange(1120);
+    mockPortfolioApi.getPortfolio(userId).then(data => {
+      setPortfolio(data);
+      setLoading(false);
+    });
+  }, [userId]);
+
+  const handleInvest = async () => {
+    if (!selectedInstrument) return;
+    
+    const amount = Number(investAmount);
+    if (isNaN(amount) || amount <= 0) {
+      setInvestError('Please enter a valid amount.');
+      return;
     }
-  }, [location.state]);
+    if (amount > money) {
+      setInvestError('Insufficient cash.');
+      return;
+    }
 
-  const handleAssetClick = (asset: Asset) => {
-    if (asset.isLocked) return;
-    setSelectedAsset(asset);
-    setPurchaseState('idle');
+    setInvestError('');
+    setInvesting(true);
+
+    try {
+      const response = await mockPortfolioApi.invest(userId, selectedInstrument.tier, selectedInstrument.instrument.id, amount);
+      if (response.success) {
+        // Deduct money from global state (Net Worth stays the same as cash becomes asset)
+        // Wait, updateMoney adds money, so we pass negative
+        updateMoney(-amount);
+        if (portfolio) {
+          updateNetWorth(response.updatedNetWorth - portfolio.totalNetWorth);
+        }
+
+        // Optimistically update local portfolio
+        setPortfolio(prev => {
+          if (!prev) return prev;
+          const newPortfolio = { ...prev };
+          const instruments = newPortfolio.tiers[selectedInstrument.tier].instruments;
+          const index = instruments.findIndex(i => i.id === selectedInstrument.instrument.id);
+          if (index !== -1) {
+            instruments[index] = response.updatedInstrument;
+          }
+          newPortfolio.totalNetWorth = response.updatedNetWorth;
+          return newPortfolio;
+        });
+
+        setSelectedInstrument(null);
+        setInvestAmount('');
+      }
+    } catch (e: any) {
+      setInvestError(e.message || 'Investment failed');
+    } finally {
+      setInvesting(false);
+    }
   };
 
-  const closeDialog = () => {
-    setSelectedAsset(null);
-    setPurchaseState('idle');
+  const handleWithdraw = async () => {
+    if (!selectedInstrument) return;
+    
+    const amount = Number(investAmount); // using the same input for amount
+    if (isNaN(amount) || amount <= 0) {
+      setInvestError('Please enter a valid amount.');
+      return;
+    }
+    if (amount > selectedInstrument.instrument.currentValue) {
+      setInvestError('Insufficient funds in instrument.');
+      return;
+    }
+
+    setInvestError('');
+    setInvesting(true);
+
+    try {
+      const response = await mockPortfolioApi.withdraw(userId, selectedInstrument.tier, selectedInstrument.instrument.id, amount);
+      if (response.success) {
+        // Add money to global state
+        updateMoney(amount);
+        if (portfolio) {
+          updateNetWorth(response.updatedNetWorth - portfolio.totalNetWorth);
+        }
+
+        // Optimistically update local portfolio
+        setPortfolio(prev => {
+          if (!prev) return prev;
+          const newPortfolio = { ...prev };
+          const instruments = newPortfolio.tiers[selectedInstrument.tier].instruments;
+          const index = instruments.findIndex(i => i.id === selectedInstrument.instrument.id);
+          if (index !== -1) {
+            instruments[index] = response.updatedInstrument;
+          }
+          newPortfolio.totalNetWorth = response.updatedNetWorth;
+          return newPortfolio;
+        });
+
+        setSelectedInstrument(null);
+        setInvestAmount('');
+      }
+    } catch (e: any) {
+      setInvestError(e.message || 'Withdrawal failed');
+    } finally {
+      setInvesting(false);
+    }
   };
 
-  const simulatePurchase = () => {
-    setPurchaseState('processing');
-    setTimeout(() => {
-      setPurchaseState('success');
-      updateNetWorth(5000); // Simulate mock bump
-      setMockChange(prev => prev + 120);
-      completeMission('diversify');
-      unlockAchievement('diversify');
-    }, 1500);
-  };
+  if (loading || !portfolio) {
+    return (
+      <div className="flex-1 w-full h-full flex items-center justify-center pt-32">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-4 border-primary"></div>
+      </div>
+    );
+  }
+
+  const activeInstruments = portfolio.tiers[activeTab].instruments;
 
   return (
-    <motion.div
+    <motion.div 
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      transition={{ duration: 0.5 }}
-      className="max-w-7xl mx-auto space-y-10 relative pb-20"
+      className="max-w-4xl mx-auto pb-32"
     >
       {/* Header */}
-      <div className="flex flex-col md:flex-row items-start justify-between space-y-4 md:space-y-0">
-        <div>
-          <div className="flex items-center space-x-4 mb-2">
-            <TrendingUp className="w-8 h-8 text-success shadow-[0_0_15px_rgba(34,197,94,0.3)] rounded-full" />
-            <h1 className="text-4xl font-display font-bold tracking-widest text-transparent bg-clip-text bg-gradient-to-r from-white to-success/80 uppercase">
-              Investment District
-            </h1>
+      <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
+        <div className="flex items-center space-x-4">
+          <button 
+            onClick={() => navigate('/world')}
+            className="w-12 h-12 bg-surface rounded-full flex items-center justify-center shadow-md hover:scale-105 active:scale-95 transition-all text-text-secondary hover:text-text-primary"
+          >
+            <ArrowLeft className="w-6 h-6" />
+          </button>
+          <div>
+            <h1 className="text-3xl md:text-4xl font-display font-black text-text-primary">Investment District</h1>
+            <p className="text-text-secondary font-medium mt-1">Build your wealth across different risk tiers.</p>
           </div>
-          <p className="text-textSecondary text-lg tracking-wide">Build your financial future.</p>
+        </div>
+        <div className="bg-surface px-6 py-3 rounded-2xl shadow-sm border-2 border-border/50 text-right">
+          <div className="text-xs font-bold text-text-secondary uppercase tracking-wider">Total Portfolio</div>
+          <div className="text-2xl font-black text-primary">₹{portfolio.totalNetWorth.toLocaleString()}</div>
         </div>
       </div>
 
-      {/* Top Financial HUD */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="glass px-8 py-6 rounded-2xl border border-success/30 glow-success flex flex-col justify-center">
-          <span className="text-sm text-textSecondary uppercase tracking-widest mb-1">Total Net Worth</span>
-          <AnimatedNumber value={netWorth} className="text-4xl font-display font-bold text-white tracking-wider" prefix="₹" />
-        </div>
-        
-        <div className="glass px-8 py-6 rounded-2xl border border-white/5 flex flex-col justify-center">
-          <span className="text-sm text-textSecondary uppercase tracking-widest mb-1">Today's Change</span>
-          <div className="flex items-center space-x-3">
-            <span className="text-2xl font-mono font-bold text-success">+₹{mockChange.toLocaleString()}</span>
-            <Badge variant="success" className="text-xs py-1"><ArrowUpRight className="w-3 h-3 mr-1" />+1.76%</Badge>
-          </div>
-        </div>
-
-        <div className="glass px-8 py-6 rounded-2xl border border-primary/20 shadow-[0_0_15px_rgba(124,92,255,0.2)] flex flex-col justify-center relative overflow-hidden">
-          <div className="absolute right-0 top-0 bottom-0 w-32 bg-gradient-to-l from-primary/10 to-transparent"></div>
-          <span className="text-sm text-textSecondary uppercase tracking-widest mb-1">Financial Health</span>
-          <div className="flex items-end space-x-2">
-            <span className="text-4xl font-display font-bold text-white">{health}</span>
-            <span className="text-lg text-textSecondary mb-1">/100</span>
-          </div>
-        </div>
+      {/* Tabs */}
+      <div className="flex space-x-2 md:space-x-4 mb-8 bg-surface p-2 rounded-2xl shadow-sm overflow-x-auto">
+        <TabButton 
+          active={activeTab === 'foundation'} 
+          onClick={() => setActiveTab('foundation')}
+          icon={<Shield className="w-5 h-5" />}
+          label="Foundation"
+          color="blue"
+        />
+        <TabButton 
+          active={activeTab === 'growth'} 
+          onClick={() => setActiveTab('growth')}
+          icon={<TrendingUp className="w-5 h-5" />}
+          label="Growth"
+          color="green"
+        />
+        <TabButton 
+          active={activeTab === 'sandbox'} 
+          onClick={() => setActiveTab('sandbox')}
+          icon={<AlertTriangle className="w-5 h-5" />}
+          label="High-Risk Sandbox"
+          color="gray"
+        />
       </div>
 
-      {/* Portfolio Allocation */}
-      <Card className="glass border-white/5 relative overflow-hidden">
-        <div className="absolute top-[-50%] right-[-10%] w-96 h-96 bg-primary/5 rounded-full blur-[100px] pointer-events-none"></div>
-        <CardHeader>
-          <div className="flex items-center space-x-2">
-            <BarChart4 className="w-5 h-5 text-textSecondary" />
-            <CardTitle className="text-xl text-white tracking-wider">Portfolio Allocation</CardTitle>
-          </div>
-        </CardHeader>
-        <CardContent className="space-y-8">
-           {/* Visual Stacked Bar */}
-           <div className="h-4 w-full bg-surface rounded-full flex overflow-hidden border border-white/10 shadow-inner">
-             {allocation.map((item, idx) => (
-               <motion.div 
-                 key={item.label}
-                 initial={{ width: 0 }}
-                 animate={{ width: `${item.percent}%` }}
-                 transition={{ duration: 1.5, delay: idx * 0.1, ease: "easeOut" }}
-                 className={cn("h-full", item.color, item.shadow)}
-                 title={`${item.label} ${item.percent}%`}
-               ></motion.div>
-             ))}
-           </div>
-           
-           {/* Legend Cards */}
-           <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-             {allocation.map((item, idx) => (
-               <motion.div 
-                 key={item.label}
-                 initial={{ opacity: 0, y: 10 }}
-                 animate={{ opacity: 1, y: 0 }}
-                 transition={{ duration: 0.5, delay: idx * 0.1 + 0.5 }}
-                 className="flex flex-col items-center p-3 rounded-xl bg-black/40 border border-white/5"
-               >
-                 <div className="flex items-center space-x-2 mb-2">
-                   <div className={cn("w-3 h-3 rounded-full", item.color, item.shadow)}></div>
-                   <span className="text-xs text-textSecondary font-semibold uppercase">{item.label}</span>
-                 </div>
-                 <span className="text-lg font-mono font-bold text-white">{item.percent}%</span>
-               </motion.div>
-             ))}
-           </div>
-        </CardContent>
-      </Card>
-
-      {/* Asset Universe */}
-      <div>
-        <h2 className="text-2xl font-display font-bold text-white mb-6 flex items-center">
-          <Activity className="w-5 h-5 text-success mr-3" />
-          Your Asset Universe
-        </h2>
-        
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {assets.map((asset, idx) => (
-            <motion.div
-              key={asset.id}
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.4, delay: idx * 0.05 }}
-              onClick={() => handleAssetClick(asset)}
-              className={cn(
-                "p-6 rounded-2xl border transition-all duration-300 relative overflow-hidden group flex flex-col justify-between h-48 hover:scale-105 hover:shadow-xl",
-                asset.isLocked 
-                  ? "bg-surface/30 border-white/5 cursor-not-allowed opacity-60 grayscale" 
-                  : "glass border-white/10 cursor-pointer hover:border-success/50 hover:bg-success/5 hover:-translate-y-1 shadow-lg"
-              )}
-            >
-              {asset.isLocked && (
-                <div className="absolute top-4 right-4">
-                  <Lock className="w-5 h-5 text-textSecondary" />
-                </div>
-              )}
-              <div className="flex items-center space-x-3 mb-4">
-                <div className={cn(
-                  "p-3 rounded-xl",
-                  asset.isLocked ? "bg-white/5 text-textSecondary" : `bg-white/10 ${asset.color}`
-                )}>
-                  <asset.icon className="w-6 h-6" />
-                </div>
-                <div>
-                  <h3 className="font-bold text-white tracking-wide">{asset.name}</h3>
-                  <div className="flex items-center space-x-2 mt-1">
-                    <span className="text-[10px] uppercase tracking-widest text-textSecondary">Risk:</span>
-                    <span className={cn(
-                      "text-[10px] font-bold uppercase",
-                      asset.risk === 'High' ? 'text-danger' : asset.risk === 'Medium' ? 'text-reward' : 'text-success'
-                    )}>{asset.risk}</span>
-                  </div>
-                </div>
-              </div>
-              <div className="flex items-end justify-between mt-auto">
-                <div>
-                  <div className="text-xs text-textSecondary mb-1">Current Value</div>
-                  <div className="text-xl font-mono font-bold text-white">{asset.value}</div>
-                </div>
-                {!asset.isLocked && (
-                  <div className={cn("flex items-center text-sm font-bold", asset.isPositive ? "text-success" : "text-danger")}>
-                    {asset.isPositive ? <ArrowUpRight className="w-4 h-4 mr-1" /> : <ArrowDownRight className="w-4 h-4 mr-1" />}
-                    {asset.return}
-                  </div>
-                )}
-              </div>
-            </motion.div>
-          ))}
-        </div>
+      {/* Instruments List */}
+      <div className="space-y-4">
+        {activeInstruments.map(instrument => (
+          <InstrumentCard 
+            key={instrument.id} 
+            instrument={instrument} 
+            tier={activeTab}
+            onClick={() => setSelectedInstrument({ tier: activeTab, instrument })}
+          />
+        ))}
       </div>
 
-      {/* Simulated Buy Dialog (Overlay) */}
+      {/* Invest Modal */}
       <AnimatePresence>
-        {selectedAsset && (
-          <motion.div
+        {selectedInstrument && (
+          <motion.div 
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-background/80 backdrop-blur-xl"
+            className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
+            onClick={() => setSelectedInstrument(null)}
           >
-            <motion.div
+            <motion.div 
               initial={{ scale: 0.9, y: 20 }}
               animate={{ scale: 1, y: 0 }}
               exit={{ scale: 0.9, y: 20 }}
-              className="w-full max-w-md glass-elevated border border-success/30 rounded-3xl overflow-hidden shadow-[0_0_50px_rgba(34,197,94,0.15)] relative"
+              className="bg-surface rounded-3xl p-6 md:p-8 w-full max-w-md shadow-2xl border-4 border-border"
+              onClick={e => e.stopPropagation()}
             >
-              {/* Close Button */}
-              <button 
-                onClick={closeDialog}
-                className="absolute top-4 right-4 p-2 rounded-full bg-white/5 hover:bg-white/10 text-textSecondary hover:text-white transition-colors z-10"
-              >
-                <X className="w-5 h-5" />
-              </button>
-
-              {purchaseState === 'idle' && (
-                <div className="p-8">
-                  <div className="flex items-center space-x-4 mb-8">
-                    <div className={cn("p-4 rounded-2xl bg-white/5", selectedAsset.color)}>
-                      <selectedAsset.icon className="w-8 h-8 drop-shadow-md" />
-                    </div>
-                    <div>
-                      <h2 className="text-2xl font-display font-bold text-white">{selectedAsset.name}</h2>
-                      <Badge variant="outline" className="mt-1 border-white/20">Simulated Asset</Badge>
-                    </div>
-                  </div>
-
-                  <div className="space-y-4 mb-8">
-                    <div className="flex justify-between items-center p-4 bg-black/30 rounded-xl border border-white/5">
-                      <span className="text-sm text-textSecondary uppercase tracking-widest">Expected Return</span>
-                      <span className="font-mono font-bold text-success">8-12% p.a.</span>
-                    </div>
-                    <div className="flex justify-between items-center p-4 bg-black/30 rounded-xl border border-white/5">
-                      <span className="text-sm text-textSecondary uppercase tracking-widest">Risk Profile</span>
-                      <span className={cn(
-                        "font-bold uppercase tracking-wider",
-                        selectedAsset.risk === 'High' ? 'text-danger' : selectedAsset.risk === 'Medium' ? 'text-reward' : 'text-success'
-                      )}>{selectedAsset.risk}</span>
-                    </div>
-                    <div className="flex justify-between items-center p-4 bg-black/30 rounded-xl border border-white/5">
-                      <span className="text-sm text-textSecondary uppercase tracking-widest">Portfolio Impact</span>
-                      <span className="font-bold text-primary">Diversification ++</span>
-                    </div>
-                  </div>
-
-                  <Button 
-                    className="w-full h-14 text-sm tracking-widest font-bold bg-success text-background hover:bg-success/90 shadow-[0_0_20px_rgba(34,197,94,0.4)] transition-all"
-                    onClick={simulatePurchase}
-                  >
-                    SIMULATE INVESTMENT
-                  </Button>
+              <div className="flex justify-between items-start mb-2">
+                <h2 className="text-2xl font-black text-text-primary">{selectedInstrument.instrument.name}</h2>
+                <Button variant="ghost" className="h-8 w-8 p-0 rounded-full" onClick={() => setSelectedInstrument(null)}>
+                  <ArrowLeft className="w-4 h-4 rotate-180" />
+                </Button>
+              </div>
+              
+              <p className="text-text-secondary font-medium mb-6">Enter an amount to invest or withdraw.</p>
+              
+              <div className="flex gap-4 mb-6">
+                <div className="bg-background rounded-xl p-4 flex-1 border-2 border-border/50">
+                  <div className="text-xs font-bold text-text-secondary uppercase mb-1">Available Cash</div>
+                  <div className="font-black text-success text-xl">₹{money.toLocaleString()}</div>
                 </div>
-              )}
-
-              {purchaseState === 'processing' && (
-                <div className="p-16 flex flex-col items-center justify-center text-center space-y-6 min-h-[400px]">
-                  <div className="relative w-20 h-20 flex items-center justify-center">
-                     <div className="absolute inset-0 border-4 border-t-success border-r-success border-b-transparent border-l-transparent rounded-full animate-spin"></div>
-                     <TrendingUp className="w-8 h-8 text-success animate-pulse" />
-                  </div>
-                  <h2 className="text-xl font-display font-bold text-success tracking-widest uppercase">Processing Order</h2>
-                  <p className="text-textSecondary font-mono text-sm">Executing simulated transaction...</p>
+                <div className="bg-background rounded-xl p-4 flex-1 border-2 border-border/50">
+                  <div className="text-xs font-bold text-text-secondary uppercase mb-1">Current Value</div>
+                  <div className="font-black text-primary text-xl">₹{selectedInstrument.instrument.currentValue.toLocaleString()}</div>
                 </div>
-              )}
+              </div>
 
-              {purchaseState === 'success' && (
-                <motion.div 
-                  initial={{ opacity: 0, scale: 0.8 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  className="p-10 flex flex-col items-center text-center relative overflow-hidden min-h-[400px] justify-center"
-                >
-                  <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-success/20 via-background to-background pointer-events-none"></div>
-                  
-                  <div className="w-20 h-20 rounded-full bg-success/20 flex items-center justify-center mb-6 glow-success border border-success/50 relative z-10">
-                    <CheckCircle className="w-10 h-10 text-success" />
-                  </div>
-                  
-                  <h2 className="text-2xl font-display font-bold text-white mb-2 relative z-10">Investment Successful</h2>
-                  <p className="text-textSecondary mb-8 text-sm relative z-10">
-                    Your simulated portfolio has been updated.
-                  </p>
-                  
-                  <div className="px-6 py-3 rounded-xl bg-black/50 border border-success/30 flex items-center space-x-3 shadow-[0_0_15px_rgba(34,197,94,0.2)] mb-8 relative z-10">
-                    <span className="text-xs text-textSecondary uppercase tracking-widest">Reward</span>
-                    <span className="text-xl font-mono font-bold text-success">+500 XP</span>
-                  </div>
-                  
-                  <div className="px-6 py-3 rounded-xl bg-black/50 border border-primary/30 flex flex-col items-center shadow-[0_0_15px_rgba(124,92,255,0.3)] mb-8 relative z-10 w-full">
-                    <span className="text-xs text-textSecondary uppercase tracking-widest mb-1">Unlocked</span>
-                    <span className="text-lg font-bold text-primary">Diversification Master</span>
-                  </div>
+              <div className="mb-6">
+                <label className="block text-sm font-bold text-text-secondary uppercase tracking-wider mb-2">Amount (₹)</label>
+                <input 
+                  type="number"
+                  value={investAmount}
+                  onChange={e => setInvestAmount(e.target.value)}
+                  className="w-full bg-surface-alt border-2 border-border rounded-xl px-4 py-3 font-bold text-lg focus:outline-none focus:border-primary text-text-primary"
+                  placeholder="e.g. 5000"
+                />
+                {investError && <p className="text-danger text-sm font-bold mt-2">{investError}</p>}
+              </div>
 
-                  <Button 
-                    className="w-full h-12 tracking-widest font-bold relative z-10"
-                    variant="default"
-                    onClick={() => {
-                      closeDialog();
-                      navigate('/life');
-                    }}
-                  >
-                    Return to Life Hub
-                  </Button>
-                </motion.div>
-              )}
+              <div className="flex space-x-4">
+                <Button className="game-btn-secondary flex-1 h-14 bg-danger/10 text-danger hover:bg-danger hover:text-white border-danger/20" onClick={handleWithdraw} disabled={investing || selectedInstrument.instrument.currentValue <= 0}>
+                  {investing ? '...' : 'Withdraw'}
+                </Button>
+                <Button className="game-btn-primary flex-1 h-14" onClick={handleInvest} disabled={investing}>
+                  {investing ? 'Processing...' : 'Invest'}
+                </Button>
+              </div>
             </motion.div>
           </motion.div>
         )}
       </AnimatePresence>
     </motion.div>
+  );
+}
+
+function TabButton({ active, onClick, icon, label, color }: { active: boolean, onClick: () => void, icon: React.ReactNode, label: string, color: 'blue' | 'green' | 'gray' }) {
+  let colorClasses = '';
+  if (color === 'blue') {
+    colorClasses = active ? 'bg-blue-500 text-white shadow-md' : 'text-text-secondary hover:bg-blue-50 hover:text-blue-600';
+  } else if (color === 'green') {
+    colorClasses = active ? 'bg-primary text-white shadow-md' : 'text-text-secondary hover:bg-green-50 hover:text-primary';
+  } else if (color === 'gray') {
+    colorClasses = active ? 'bg-slate-700 text-white shadow-md' : 'text-text-secondary hover:bg-slate-100 hover:text-slate-700';
+  }
+
+  return (
+    <button 
+      onClick={onClick}
+      className={`flex-1 flex items-center justify-center space-x-2 py-3 px-4 rounded-xl font-bold transition-all ${colorClasses}`}
+    >
+      {icon}
+      <span className="whitespace-nowrap">{label}</span>
+    </button>
+  );
+}
+
+function InstrumentCard({ instrument, tier, onClick }: { instrument: Instrument, tier: TierType, onClick: () => void }) {
+  const gain = instrument.currentValue - instrument.amountInvested;
+  const percent = instrument.amountInvested > 0 ? (gain / instrument.amountInvested) * 100 : 0;
+  
+  const isPositive = gain >= 0;
+  
+  // De-emphasize Sandbox visually
+  const isSandbox = tier === 'sandbox';
+  const cardStyles = isSandbox 
+    ? "bg-slate-100 border-2 border-slate-300 shadow-sm opacity-90 grayscale-[0.2]"
+    : "bg-surface border-4 border-border shadow-md hover:border-primary/50 transition-colors";
+
+  return (
+    <div 
+      className={`rounded-2xl p-5 md:p-6 cursor-pointer flex flex-col md:flex-row md:items-center justify-between gap-4 ${cardStyles}`}
+      onClick={onClick}
+    >
+      <div>
+        <div className="flex items-center space-x-2 mb-2">
+          <span className="text-xs font-black uppercase tracking-wider text-text-secondary bg-background border border-border/50 px-2 py-1 rounded-md">
+            {instrument.type.replace('_', ' ')}
+          </span>
+          {instrument.interestRate && (
+            <span className="text-xs font-bold text-blue-600 bg-blue-50 px-2 py-1 rounded-md">Fixed {instrument.interestRate}%</span>
+          )}
+          {instrument.riskLevel && (
+            <span className="text-xs font-bold text-amber-600 capitalize bg-amber-50 px-2 py-1 rounded-md">Risk: {instrument.riskLevel}</span>
+          )}
+          {instrument.volatility && (
+            <span className="text-xs font-bold text-slate-500 capitalize bg-slate-200 px-2 py-1 rounded-md">Volatility: {instrument.volatility}</span>
+          )}
+        </div>
+        <h3 className={`text-xl font-black ${isSandbox ? 'text-slate-700' : 'text-text-primary'}`}>{instrument.name}</h3>
+      </div>
+
+      <div className="flex items-center justify-between md:justify-end md:space-x-8">
+        <div className="text-left md:text-right">
+          <div className="text-xs font-bold text-text-secondary uppercase tracking-wider mb-1">Invested</div>
+          <div className="font-bold text-text-primary">₹{instrument.amountInvested.toLocaleString()}</div>
+        </div>
+        
+        <div className="text-left md:text-right">
+          <div className="text-xs font-bold text-text-secondary uppercase tracking-wider mb-1">Current Value</div>
+          <div className="flex items-center space-x-2">
+            <span className="text-xl font-black text-text-primary">₹{instrument.currentValue.toLocaleString()}</span>
+            {instrument.amountInvested > 0 && (
+              <span className={`flex items-center text-sm font-bold px-2 py-0.5 rounded-full ${isPositive ? 'text-success bg-success/10' : 'text-danger bg-danger/10'} ${isSandbox ? 'grayscale opacity-70' : ''}`}>
+                {isPositive ? <ArrowUpRight className="w-4 h-4 mr-1" /> : <ArrowDownRight className="w-4 h-4 mr-1" />}
+                {Math.abs(percent).toFixed(1)}%
+              </span>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
   );
 }

@@ -7,19 +7,25 @@ export default {
   theme: {
     extend: {
       colors: {
-        background: '#080B14',
-        surface: '#111827',
-        elevated: '#182235',
-        primary: '#7C5CFF',
-        secondary: '#00D4FF',
-        success: '#22C55E',
-        reward: '#F5B942',
-        warning: '#F97316',
-        danger: '#EF4444',
-        textPrimary: '#F8FAFC',
-        textSecondary: '#94A3B8',
-        border: 'rgba(255, 255, 255, 0.1)',
-        ring: '#7C5CFF',
+        background: '#74C2F2', // Cheerful sky blue foundation
+        surface: {
+          DEFAULT: '#FFFAEE',    // Warm creamy beige/paper surfaces
+          alt: '#E8DFCD',        // Light stone/wood surfaces
+          indigo: '#E6F0F9',     // Soft sky-tinted surfaces
+        },
+        primary: '#65B93E',    // Juicy grass green (Gardenscapes core)
+        secondary: '#3EA5EE',  // Bright sunny blue
+        success: '#35C759',    // Vibrant emerald for wealth
+        reward: '#FFD13B',     // Bright shiny gold
+        warning: '#FF9500',    // Juicy orange for energy/quests
+        danger: '#FF3B30',     // Cherry red risk
+        text: {
+          primary: '#422006',    // Rich chocolate brown for text
+          secondary: '#785338',  // Soft warm brown for secondary text
+          white: '#FFFFFF',      // Pure white text
+        },
+        border: '#D2C4A7',     // Earthy warm border for cards
+        ring: '#65B93E',
       },
       fontFamily: {
         sans: ['Inter', 'sans-serif'],

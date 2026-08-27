@@ -1,0 +1,176 @@
+@import "tailwindcss";
+
+@theme {
+  --color-background: var(--bg);
+  --color-surface: var(--surface);
+  --color-border: var(--border);
+  --color-primary: var(--primary);
+  --color-secondary: var(--secondary);
+  --color-danger: var(--danger);
+  --color-text-main: var(--text-main);
+  --color-text-muted: var(--text-muted);
+  
+  --font-mono: "Fira Code", "JetBrains Mono", monospace;
+  --font-sans: Inter, system-ui, sans-serif;
+  
+  --background-image-grid-pattern: linear-gradient(to right, var(--border) 1px, transparent 1px), linear-gradient(to bottom, var(--border) 1px, transparent 1px);
+}
+
+:root {
+  /* Light Mode (Grayscale) */
+  --bg: #ffffff;
+  --surface: #f9fafb;
+  --border: #e5e7eb;
+  --primary: #111827;
+  --secondary: #6b7280;
+  --danger: #4b5563;
+  --text-main: #111827;
+  --text-muted: #6b7280;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    /* Dark Mode (Grayscale) */
+    --bg: #000000;
+    --surface: #111111;
+    --border: #222222;
+    --primary: #ffffff;
+    --secondary: #a1a1aa;
+    --danger: #71717a;
+    --text-main: #f4f4f5;
+    --text-muted: #a1a1aa;
+  }
+}
+
+@layer base {
+  body {
+    background-color: var(--color-background);
+    color: var(--color-text-main);
+    font-family: var(--font-mono);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    background-size: 40px 40px;
+  }
+}
+
+@layer components {
+  .admin-panel {
+    background-color: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: 0.375rem;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    overflow: hidden;
+  }
+
+  .admin-input {
+    background-color: var(--color-background);
+    border: 1px solid var(--color-border);
+    color: var(--color-text-main);
+    border-radius: 0.25rem;
+    padding: 0.5rem 0.75rem;
+    width: 100%;
+    font-family: var(--font-mono);
+    transition-property: color, background-color, border-color, text-decoration-color, fill, stroke;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    transition-duration: 150ms;
+  }
+  .admin-input:focus {
+    outline: 2px solid transparent;
+    outline-offset: 2px;
+    border-color: var(--color-primary);
+  }
+
+  .admin-btn {
+    padding: 0.5rem 1rem;
+    font-weight: 700;
+    border-radius: 0.25rem;
+    transition-property: all;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    transition-duration: 150ms;
+    font-family: var(--font-mono);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  .admin-btn:active {
+    transform: scale(0.95);
+  }
+  .admin-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  .admin-btn-primary {
+    padding: 0.5rem 1rem;
+    font-weight: 700;
+    border-radius: 0.25rem;
+    transition-property: all;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    transition-duration: 150ms;
+    font-family: var(--font-sans);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    background-color: var(--color-primary);
+    color: var(--color-background);
+  }
+  .admin-btn-primary:hover {
+    background-color: var(--color-secondary);
+  }
+  .admin-btn-primary:active {
+    transform: scale(0.95);
+  }
+  .admin-btn-primary:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  .admin-btn-secondary {
+    padding: 0.5rem 1rem;
+    font-weight: 700;
+    border-radius: 0.25rem;
+    transition-property: all;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    transition-duration: 150ms;
+    font-family: var(--font-sans);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    background-color: transparent;
+    border: 1px solid var(--color-border);
+    color: var(--color-text-muted);
+  }
+  .admin-btn-secondary:hover {
+    border-color: var(--color-primary);
+    color: var(--color-primary);
+  }
+  .admin-btn-secondary:active {
+    transform: scale(0.95);
+  }
+  .admin-btn-secondary:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  .admin-btn-danger {
+    padding: 0.5rem 1rem;
+    font-weight: 700;
+    border-radius: 0.25rem;
+    transition-property: all;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    transition-duration: 150ms;
+    font-family: var(--font-sans);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    background-color: transparent;
+    border: 1px solid var(--color-danger);
+    color: var(--color-danger);
+  }
+  .admin-btn-danger:hover {
+    background-color: var(--color-border);
+  }
+  .admin-btn-danger:active {
+    transform: scale(0.95);
+  }
+  .admin-btn-danger:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}

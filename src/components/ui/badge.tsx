@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components */
 import * as React from "react"
 import { cva, type VariantProps } from "class-variance-authority"
 
@@ -18,8 +19,8 @@ const badgeVariants = cva(
           "border-reward/50 bg-reward/20 text-reward shadow-[0_0_15px_rgba(245,185,66,0.3)]",
         destructive:
           "border-danger/50 bg-danger/20 text-danger shadow-[0_0_15px_rgba(239,68,68,0.3)]",
-        outline: "text-textPrimary border-border bg-transparent",
-        glass: "glass text-textPrimary",
+        outline: "text-text-primary border-border bg-transparent",
+        glass: "glass text-text-primary",
       },
     },
     defaultVariants: {
