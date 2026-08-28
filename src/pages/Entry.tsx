@@ -168,7 +168,8 @@ export function Entry() {
         setSuccess(true);
         setTimeout(() => {
           setIsLoginOpen(false);
-          handleEnter();
+          setIsEntering(true);
+          setTimeout(() => navigate('/world'), 400);
         }, 1000);
       } else {
         setError("Registration failed. Please check your inputs.");
@@ -180,7 +181,8 @@ export function Entry() {
         setSuccess(true);
         setTimeout(() => {
           setIsLoginOpen(false);
-          handleEnter();
+          setIsEntering(true);
+          setTimeout(() => navigate('/world'), 400);
         }, 1000);
       } else {
         setError("Those credentials don't match. Please try again.");

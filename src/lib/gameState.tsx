@@ -1,6 +1,4 @@
-/* eslint-disable react-refresh/only-export-components */
-import { createContext, useContext, useState, useEffect } from 'react';
-import { mockAuthApi } from './mockAuthApi';
+import { createContext, useContext, useState, useEffect, useMemo, useRef } from 'react';
 import type { ReactNode } from 'react';
 
 export type Player = {
@@ -35,6 +33,7 @@ export type District = {
   reward: string;
   path: string;
   locked: boolean;
+  marketValue: string; // New field for district economic value
 };
 
 type GameState = {
@@ -101,13 +100,9 @@ export const GameStateProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
-  // Initial sync and polling
+  // Initial sync
   useEffect(() => {
     syncState(); // Check if already logged in via cookie on mount
-    
-    // Poll every 5 seconds to get updates from Admin
-    const interval = setInterval(syncState, 5000);
-    return () => clearInterval(interval);
   }, []);
 
   const login = async (userId: string, password?: string): Promise<boolean> => {
@@ -128,16 +123,19 @@ export const GameStateProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const register = async (displayName: string, email: string, password?: string, ageConfirm?: boolean): Promise<boolean> => {
-    const res = await mockAuthApi.register({ displayName, email, password, ageConfirmation: !!ageConfirm });
-    if (res.success && res.userId) {
-      // Mock log in immediately
-      setUser({ userId: res.userId, displayName, email, avatarId: 'avatar_01' });
-      setLevel(1);
-      setXp(0);
-      setMoney(10000); // Default cash
-      setNetWorth(10000);
-      setHealth(100);
-      return true;
+    if (!ageConfirm) return false;
+    try {
+      const res = await fetch('/api/player/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ displayName, email, password })
+      });
+      if (res.ok) {
+        await syncState();
+        return true;
+      }
+    } catch (e) {
+      console.error(e);
     }
     return false;
   };
@@ -165,15 +163,15 @@ export const GameStateProvider = ({ children }: { children: ReactNode }) => {
     { id: 'study_bonds', title: 'Bond Builder', reward: 150, completed: false },
   ]);
 
-  const [districts] = useState<District[]>([
-    { id: 'study', name: 'Study 🎓', description: 'Understand money. Make smarter decisions. Build your world.', progress: '0%', reward: '+XP', path: '/study', locked: false },
-    { id: 'academy', name: 'Fin Academy', description: 'Learn how money works.', progress: '80%', reward: '+250 XP', path: '/academy', locked: false },
-    { id: 'investment', name: 'Investment District', description: 'Grow your wealth through smart decisions.', progress: '20%', reward: '+500 XP', path: '/investment', locked: false },
-    { id: 'market', name: 'Market City', description: 'Experience supply, demand, and economics.', progress: 'Locked', reward: 'Level 20 Req', path: '/market', locked: true },
-    { id: 'life', name: 'Life Hub', description: 'Build your life, set goals, and thrive.', progress: '50%', reward: '+100 XP', path: '/life', locked: false },
-    { id: 'security', name: 'Security Center', description: 'Spot frauds, earn badges, stay safe.', progress: '0%', reward: 'Fraud Spotter Badge', path: '/security', locked: false },
-    { id: 'social', name: 'Social Hub', description: 'Connect, compete, and show off your progress.', progress: 'Active', reward: 'Rank #24', path: '/social', locked: false },
-  ]);
+  const districts = useMemo<District[]>(() => [
+    { id: 'study', name: 'Study 🎓', description: 'Understand money. Make smarter decisions. Build your world.', progress: '0%', reward: '+XP', path: '/study', locked: false, marketValue: '₹0' },
+    { id: 'academy', name: 'Fin Academy', description: 'Learn how money works.', progress: '80%', reward: '+250 XP', path: '/academy', locked: false, marketValue: '₹4.2M' },
+    { id: 'investment', name: 'Investment District', description: 'Grow your wealth through smart decisions.', progress: '20%', reward: '+500 XP', path: '/investment', locked: false, marketValue: '₹12.5M' },
+    { id: 'market', name: 'Market City', description: 'Experience supply, demand, and economics.', progress: level >= 20 ? 'Active' : 'Locked', reward: 'Level 20 Req', path: '/market', locked: level < 20, marketValue: '₹8.9M' },
+    { id: 'life', name: 'Life Hub', description: 'Build your life, set goals, and thrive.', progress: '50%', reward: '+100 XP', path: '/life', locked: false, marketValue: '₹1.1M' },
+    { id: 'security', name: 'Security Center', description: 'Spot frauds, earn badges, stay safe.', progress: '0%', reward: 'Fraud Spotter Badge', path: '/security', locked: false, marketValue: '₹500K' },
+    { id: 'social', name: 'Social Hub', description: 'Connect, compete, and show off your progress.', progress: 'Active', reward: 'Rank #24', path: '/social', locked: false, marketValue: '₹0' },
+  ], [level]);
 
   const [toasts, setToasts] = useState<ToastMessage[]>([]);
 
@@ -244,6 +242,22 @@ export const GameStateProvider = ({ children }: { children: ReactNode }) => {
   const updateHealth = (value: number) => setHealth(value);
   const updateNetWorth = (delta: number) => setNetWorth((prev) => prev + delta);
   const updateMoney = (delta: number) => setMoney((prev) => prev + delta);
+
+  // Sync local changes to backend
+  const isInitialMount = useRef(true);
+  useEffect(() => {
+    if (isInitialMount.current) {
+      isInitialMount.current = false;
+      return;
+    }
+    if (user) {
+      fetch('/api/player/update', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ level, xp, money, netWorth, health, streakDays, achievements })
+      }).catch(console.error);
+    }
+  }, [level, xp, money, netWorth, health, streakDays, achievements, user]);
 
   return (
     <GameStateContext.Provider

@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, useLocation, Navigate } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
 import { GlobalLayout } from './components/layout/GlobalLayout';
 import { FinAcademy } from './pages/FinAcademy';
@@ -13,7 +13,6 @@ import { WorldMap3D } from './pages/WorldMap3D';
 import { StudyDistrict } from './pages/StudyDistrict';
 import { StudyLesson } from './pages/StudyLesson';
 import { GameStateProvider } from './lib/gameState';
-import { MoneyBirdLayer } from './components/layout/MoneyBirdLayer';
 import { ProtectedRoute } from './components/auth/ProtectedRoute';
 
 function AnimatedRoutes() {
@@ -53,6 +52,9 @@ function AnimatedRoutes() {
           <Route path="security" element={<SecurityChallenge />} />
           <Route path="social" element={<SocialHub />} />
         </Route>
+        
+        {/* Catch all */}
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </AnimatePresence>
   );
@@ -61,7 +63,6 @@ function AnimatedRoutes() {
 function App() {
   return (
     <GameStateProvider>
-      <MoneyBirdLayer />
       <BrowserRouter>
         <AnimatedRoutes />
       </BrowserRouter>

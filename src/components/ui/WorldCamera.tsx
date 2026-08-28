@@ -101,7 +101,7 @@ export function WorldCamera({ children, focusedLocation, locations }: WorldCamer
   return (
     <div 
       ref={scrollRef} 
-      className="relative w-full h-full overflow-y-auto overflow-x-hidden bg-[#55B84A] scroll-smooth"
+      className="relative w-full h-full overflow-hidden bg-[#55B84A] scroll-smooth"
       onPointerDown={handlePointerDown}
       onPointerMove={handlePointerMove}
       onPointerUp={handlePointerUp}

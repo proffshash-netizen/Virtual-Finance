@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;800;900&family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -38,30 +38,32 @@
     @apply font-display font-black tracking-tight text-text-primary drop-shadow-sm;
   }
 
-  /* Chunky Gardenscapes-style card */
+  /* Medieval parchment-style card */
   .game-card {
-    @apply bg-surface text-text-primary border-4 border-b-[8px] border-border shadow-[0_12px_24px_rgba(66,32,6,0.15)] rounded-[32px] transition-all duration-300 hover:shadow-[0_20px_32px_rgba(66,32,6,0.2)] hover:-translate-y-1;
+    @apply bg-[#F4E4BC] text-[#3E2723] border-[6px] border-[#8D6E63] shadow-[inset_0_0_20px_rgba(141,110,99,0.3),_0_12px_24px_rgba(66,32,6,0.3)] rounded-lg transition-all duration-300 hover:shadow-[inset_0_0_20px_rgba(141,110,99,0.3),_0_20px_32px_rgba(66,32,6,0.4)] hover:-translate-y-1 relative;
+    background-image: url("https://www.transparenttextures.com/patterns/aged-paper.png");
   }
 
   .game-card-indigo {
-    @apply bg-surface-indigo text-text-primary border-4 border-b-[8px] border-[#C2D6E8] shadow-[0_12px_24px_rgba(66,32,6,0.15)] rounded-[32px] transition-all duration-300;
+    @apply bg-[#EFEBE4] text-[#3E2723] border-[6px] border-[#5D4037] shadow-[inset_0_0_20px_rgba(93,64,55,0.2),_0_12px_24px_rgba(66,32,6,0.3)] rounded-lg transition-all duration-300 relative;
+    background-image: url("https://www.transparenttextures.com/patterns/aged-paper.png");
   }
   
-  /* Tactile chunky game buttons */
+  /* Tactile chunky medieval buttons */
   .game-btn-primary {
-    @apply bg-primary text-white border-4 border-b-[8px] border-[#448A27] shadow-[inset_0_4px_rgba(255,255,255,0.4),_0_8px_16px_rgba(101,185,62,0.4)] font-black tracking-widest uppercase rounded-3xl active:border-b-4 active:translate-y-[4px] transition-all;
+    @apply bg-gradient-to-b from-[#2E7D32] to-[#1B5E20] text-white border-2 border-[#145A14] shadow-[inset_0_2px_4px_rgba(255,255,255,0.3),_0_6px_0_#0F400F,_0_10px_10px_rgba(0,0,0,0.5)] active:shadow-[inset_0_4px_8px_rgba(0,0,0,0.6),_0_0px_0_#0F400F,_0_4px_4px_rgba(0,0,0,0.5)] active:translate-y-[6px] transition-all font-display uppercase tracking-widest font-black text-center rounded-md;
   }
 
   .game-btn-success {
-    @apply bg-success text-white border-4 border-b-[8px] border-[#228C3B] shadow-[inset_0_4px_rgba(255,255,255,0.4),_0_8px_16px_rgba(53,199,89,0.4)] font-black tracking-widest uppercase rounded-3xl active:border-b-4 active:translate-y-[4px] transition-all;
+    @apply bg-gradient-to-b from-[#00695C] to-[#004D40] text-white border-2 border-[#00332A] shadow-[inset_0_2px_4px_rgba(255,255,255,0.3),_0_6px_0_#00221C,_0_10px_10px_rgba(0,0,0,0.5)] active:shadow-[inset_0_4px_8px_rgba(0,0,0,0.6),_0_0px_0_#00221C,_0_4px_4px_rgba(0,0,0,0.5)] active:translate-y-[6px] transition-all font-display uppercase tracking-widest font-black text-center rounded-md;
   }
 
   .game-btn-reward {
-    @apply bg-reward text-[#5A3800] border-4 border-b-[8px] border-[#CC9A00] shadow-[inset_0_4px_rgba(255,255,255,0.6),_0_8px_16px_rgba(255,209,59,0.4)] font-black tracking-widest uppercase rounded-3xl active:border-b-4 active:translate-y-[4px] transition-all;
+    @apply bg-gradient-to-b from-[#F57F17] to-[#F9A825] text-[#3E2723] border-2 border-[#F57F17] shadow-[inset_0_2px_4px_rgba(255,255,255,0.6),_0_6px_0_#E65100,_0_10px_10px_rgba(0,0,0,0.5)] active:shadow-[inset_0_4px_8px_rgba(0,0,0,0.4),_0_0px_0_#E65100,_0_4px_4px_rgba(0,0,0,0.5)] active:translate-y-[6px] transition-all font-display uppercase tracking-widest font-black text-center rounded-md;
   }
 
   .game-btn-secondary {
-    @apply bg-secondary text-white border-4 border-b-[8px] border-[#1D74B3] shadow-[inset_0_4px_rgba(255,255,255,0.4),_0_8px_16px_rgba(62,165,238,0.4)] font-black tracking-widest uppercase rounded-3xl active:border-b-4 active:translate-y-[4px] transition-all;
+    @apply bg-gradient-to-b from-[#5D4037] to-[#3E2723] text-[#F4E4BC] border-2 border-[#271510] shadow-[inset_0_2px_4px_rgba(255,255,255,0.2),_0_6px_0_#1A0E0A,_0_10px_10px_rgba(0,0,0,0.5)] active:shadow-[inset_0_4px_8px_rgba(0,0,0,0.6),_0_0px_0_#1A0E0A,_0_4px_4px_rgba(0,0,0,0.5)] active:translate-y-[6px] transition-all font-display uppercase tracking-widest font-black text-center rounded-md;
   }
 
   /* Casual game solid panels (replacing glass) */
@@ -320,3 +322,28 @@
     transform: none !important;
   }
 }
+
+@layer components {
+  /* Medieval UI Reskin Classes */
+  .medieval-parchment {
+    @apply bg-[#F4E4BC] text-[#3E2723] border-4 border-[#8D6E63] shadow-[inset_0_0_20px_rgba(141,110,99,0.2),_0_10px_20px_rgba(0,0,0,0.3)] relative;
+    background-image: url("https://www.transparenttextures.com/patterns/aged-paper.png");
+  }
+  
+  .medieval-button {
+    @apply bg-gradient-to-b from-[#757575] to-[#424242] text-white border-2 border-[#212121] rounded-lg shadow-[inset_0_2px_4px_rgba(255,255,255,0.3),_0_4px_6px_rgba(0,0,0,0.5)] active:shadow-[inset_0_4px_8px_rgba(0,0,0,0.6)] active:translate-y-[2px] transition-all font-display uppercase tracking-widest font-black;
+  }
+  
+  .medieval-button-primary {
+    @apply bg-gradient-to-b from-[#2E7D32] to-[#1B5E20] text-white border-2 border-[#145A14] rounded-lg shadow-[inset_0_2px_4px_rgba(255,255,255,0.3),_0_4px_6px_rgba(0,0,0,0.5)] active:shadow-[inset_0_4px_8px_rgba(0,0,0,0.6)] active:translate-y-[2px] transition-all font-display uppercase tracking-widest font-black text-center;
+  }
+  
+  .medieval-metal-trim {
+    @apply border-[#5D4037] border-[3px] shadow-[0_2px_4px_rgba(0,0,0,0.4)];
+  }
+
+  .medieval-wood-plaque {
+    @apply bg-gradient-to-b from-[#5D4037] to-[#3E2723] text-[#F4E4BC] border-[3px] border-[#271510] shadow-[inset_0_1px_1px_rgba(255,255,255,0.2),_0_4px_10px_rgba(0,0,0,0.4)] font-display uppercase;
+  }
+}
+
