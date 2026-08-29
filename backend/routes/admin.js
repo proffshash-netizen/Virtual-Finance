@@ -19,7 +19,7 @@ router.post('/login', async (req, res) => {
     if (!isValid) return res.status(401).json({ error: 'Invalid credentials' });
 
     const token = generateToken(user.id, user.role);
-    res.cookie('finlit_session', token, {
+    res.cookie('finlit_admin_session', token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',
@@ -35,8 +35,12 @@ router.post('/login', async (req, res) => {
 
 // Admin Logout
 router.post('/logout', (req, res) => {
-  res.clearCookie('finlit_session');
-  res.json({ success: true });
+  res.clearCookie('finlit_admin_session', {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'lax'
+  });
+  res.json({ message: 'Logged out successfully' });
 });
 
 // Admin check session

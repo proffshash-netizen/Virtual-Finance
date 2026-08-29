@@ -52,63 +52,78 @@ export function VillageMap({ mini = false, onLocationClick, setActiveHover }: Vi
           </div>
         )}
 
-      {/* 1.5 Animated Map Characters Overlay */}
+      {/* 1.5 Ambient Life Layer */}
       {!mini && (
         <div className="absolute inset-0 pointer-events-none z-[5]">
-          {/* Villager 1: Walking from Market to Bridge */}
-          <motion.div 
-            className="absolute"
-            animate={{ 
-              left: ['50%', '40%', '50%'], 
-              top: ['55%', '60%', '55%'],
-              scaleX: [1, 1, -1, -1] // flips direction
-            }}
-            transition={{ duration: 15, repeat: Infinity, ease: "linear" }}
-          >
+          {/* 1. Fin Academy Student (Idling) */}
+          <div className="absolute animate-bob" style={{ left: '60%', top: '22%' }}>
             <div className="relative">
-              <div className="absolute -bottom-[2px] left-1/2 -translate-x-1/2 w-4 h-1.5 bg-black/30 rounded-full blur-[1px]"></div>
-              <div className="w-3.5 h-5 bg-orange-700 rounded-t-full rounded-b-sm shadow-sm border border-black/20 flex flex-col items-center">
-                 <div className="w-3 h-3 bg-[#FFCDB2] rounded-full -mt-1 shadow-sm"></div>
+              <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-6 h-2 bg-black/30 rounded-full blur-[2px]"></div>
+              <div className="w-6 h-10 bg-[#3949AB] rounded-t-full rounded-b-sm shadow-md border border-[#283593] flex flex-col items-center">
+                 <div className="w-5 h-5 bg-[#FFCCBC] rounded-full -mt-2 shadow-sm border border-[#D84315]"></div>
+                 {/* Book */}
+                 <div className="w-5 h-2 bg-[#FFF9C4] mt-1 rounded-sm shadow-sm border border-[#FBC02D]"></div>
               </div>
             </div>
-          </motion.div>
+          </div>
 
-          {/* Villager 2: Walking near the Church */}
-          <motion.div 
-            className="absolute"
-            animate={{ 
-              left: ['60%', '70%', '60%'], 
-              top: ['78%', '75%', '78%'],
-              scaleX: [-1, -1, 1, 1] 
-            }}
-            transition={{ duration: 20, repeat: Infinity, ease: "linear", delay: 2 }}
-          >
-            <div className="relative">
-              <div className="absolute -bottom-[2px] left-1/2 -translate-x-1/2 w-4 h-1.5 bg-black/30 rounded-full blur-[1px]"></div>
-              <div className="w-3 h-4 bg-emerald-700 rounded-t-full rounded-b-sm shadow-sm border border-black/20 flex flex-col items-center">
-                 <div className="w-2.5 h-2.5 bg-[#FFCDB2] rounded-full -mt-1 shadow-sm"></div>
+          {/* 2. Market Shopper (Walking) */}
+          <div className="absolute" style={{ left: '55%', top: '55%' }}>
+            <div className="animate-walk">
+              <div className="relative">
+                <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-6 h-2 bg-black/30 rounded-full blur-[2px]"></div>
+                <div className="w-6 h-10 bg-[#43A047] rounded-t-full rounded-b-sm shadow-md border border-[#2E7D32] flex flex-col items-center">
+                   <div className="w-5 h-5 bg-[#FFCCBC] rounded-full -mt-2 shadow-sm border border-[#D84315]"></div>
+                   {/* Basket */}
+                   <div className="absolute -right-2 top-4 w-4 h-4 bg-[#8D6E63] rounded-b-xl rounded-t-sm border border-[#5D4037]"></div>
+                </div>
               </div>
             </div>
-          </motion.div>
+          </div>
 
-          {/* Villager 3: Standing near Academy, pacing */}
-          <motion.div 
-            className="absolute"
-            animate={{ 
-              left: ['70%', '72%', '70%'], 
-              top: ['25%', '25%', '25%'],
-              scaleX: [1, -1, 1] 
-            }}
-            transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
-          >
+          {/* 3. Investment Banker (Idling) */}
+          <div className="absolute animate-bob" style={{ left: '72%', top: '38%', animationDelay: '0.5s' }}>
             <div className="relative">
-              <div className="absolute -bottom-[2px] left-1/2 -translate-x-1/2 w-4 h-1.5 bg-black/30 rounded-full blur-[1px]"></div>
-              <div className="w-3.5 h-5 bg-indigo-700 rounded-t-full rounded-b-sm shadow-sm border border-black/20 flex flex-col items-center">
-                 <div className="w-3 h-3 bg-[#FFCDB2] rounded-full -mt-1 shadow-sm"></div>
-                 <div className="w-4 h-1 bg-slate-200 mt-1 rounded-sm"></div> {/* Book */}
+              <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-6 h-2 bg-black/30 rounded-full blur-[2px]"></div>
+              <div className="w-6 h-11 bg-[#424242] rounded-t-lg rounded-b-sm shadow-md border border-[#212121] flex flex-col items-center">
+                 <div className="w-5 h-5 bg-[#FFE0B2] rounded-full -mt-2 shadow-sm border border-[#E65100]"></div>
+                 {/* Tie */}
+                 <div className="w-1 h-4 bg-[#E53935] mt-0.5"></div>
               </div>
             </div>
-          </motion.div>
+          </div>
+
+          {/* 4. Village Dog (Sleeping/Bobbing) */}
+          <div className="absolute animate-bob" style={{ left: '50%', top: '42%', animationDuration: '3s' }}>
+            <div className="relative flex items-end">
+              <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-8 h-2 bg-black/30 rounded-full blur-[2px]"></div>
+              <div className="w-8 h-5 bg-[#8D6E63] rounded-t-xl rounded-b-sm border border-[#5D4037]"></div>
+              <div className="w-4 h-4 bg-[#8D6E63] rounded-full -ml-2 mb-1 border border-[#5D4037]"></div>
+            </div>
+          </div>
+
+          {/* 5. Wandering Villager (Walking) */}
+          <div className="absolute" style={{ left: '40%', top: '65%' }}>
+            <div className="animate-walk" style={{ animationDuration: '12s', animationDelay: '2s' }}>
+              <div className="relative">
+                <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-6 h-2 bg-black/30 rounded-full blur-[2px]"></div>
+                <div className="w-6 h-10 bg-[#F4511E] rounded-t-full rounded-b-sm shadow-md border border-[#D84315] flex flex-col items-center">
+                   <div className="w-5 h-5 bg-[#FFCCBC] rounded-full -mt-2 shadow-sm border border-[#D84315]"></div>
+                   {/* Walking stick */}
+                   <div className="absolute -right-1 top-2 w-1 h-10 bg-[#5D4037] rotate-[15deg]"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* 6. Hopping Sparrow (Bobbing Fast) */}
+          <div className="absolute animate-bob" style={{ left: '42%', top: '25%', animationDuration: '0.8s' }}>
+            <div className="relative">
+              <div className="absolute -bottom-[1px] left-1/2 -translate-x-1/2 w-3 h-1 bg-black/30 rounded-full blur-[1px]"></div>
+              <div className="w-3 h-3 bg-[#A1887F] rounded-full border border-[#795548]"></div>
+              <div className="absolute top-1 right-0 w-1 h-1 bg-[#D7CCC8] rounded-full"></div> {/* beak */}
+            </div>
+          </div>
         </div>
       )}
 

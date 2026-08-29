@@ -18,8 +18,8 @@ router.post('/login', async (req, res) => {
     const isValid = await bcrypt.compare(password, user.password);
     if (!isValid) return res.status(401).json({ error: 'Invalid credentials' });
 
-    const token = generateToken(user.id, user.role);
-    res.cookie('finlit_session', token, {
+    const token = generateToken(user.id, user.role, '30d');
+    res.cookie('finlit_player_session', token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',
@@ -35,8 +35,12 @@ router.post('/login', async (req, res) => {
 
 // Player Logout
 router.post('/logout', (req, res) => {
-  res.clearCookie('finlit_session');
-  res.json({ success: true });
+  res.clearCookie('finlit_player_session', {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'lax'
+  });
+  res.json({ message: 'Logged out successfully' });
 });
 
 // Player Register
@@ -53,8 +57,8 @@ router.post('/register', async (req, res) => {
         [newUserId, hashedPassword, 'player', displayName, email, 'avatar_01', 1, 0, 10000, 10000, 100, 0, '[]', '["study"]']
     );
 
-    const token = generateToken(newUserId, 'player');
-    res.cookie('finlit_session', token, {
+    const token = generateToken(newUserId, 'player', '30d');
+    res.cookie('finlit_player_session', token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',

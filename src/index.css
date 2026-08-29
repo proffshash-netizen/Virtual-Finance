@@ -9,7 +9,7 @@
     font-size: 19px;
   }
   body {
-    @apply bg-background text-text-primary font-sans antialiased min-h-screen overflow-x-hidden;
+    @apply bg-[#4A6741] text-text-primary font-sans antialiased min-h-screen overflow-x-hidden;
   }
 
   h1, h2, h3, h4, h5, h6 {

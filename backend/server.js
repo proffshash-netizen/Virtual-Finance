@@ -1,3 +1,4 @@
+require('dotenv').config();
 const express = require('express');
 const cookieParser = require('cookie-parser');
 const cors = require('cors');
@@ -5,6 +6,7 @@ const { initDb } = require('./db');
 
 const adminRoutes = require('./routes/admin');
 const playerRoutes = require('./routes/player');
+const guideRoutes = require('./routes/guide');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -32,6 +34,7 @@ app.use(cors({
 // Routes
 app.use('/api/admin', adminRoutes);
 app.use('/api/player', playerRoutes);
+app.use('/api/guide', guideRoutes);
 
 // Health check
 app.get('/api/health', (req, res) => {

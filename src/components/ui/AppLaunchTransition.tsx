@@ -64,7 +64,7 @@ export function AppLaunchTransition({ isLoading, children }: AppLaunchTransition
   }
 
   return (
-    <div className="relative w-full h-full overflow-hidden" onClick={handleInterrupt}>
+    <div className="relative w-full h-full" onClick={handleInterrupt}>
       <AnimatePresence mode="wait">
         
         {/* PHASE 1: SPLASH */}
@@ -162,7 +162,7 @@ export function AppLaunchTransition({ isLoading, children }: AppLaunchTransition
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, ease: smoothBezier }}
-            className="w-full h-full"
+            className="w-full"
           >
             {children}
           </motion.div>

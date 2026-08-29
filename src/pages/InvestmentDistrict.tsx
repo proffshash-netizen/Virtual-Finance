@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useGameState } from '../lib/gameState';
 import { mockPortfolioApi } from '../lib/mockPortfolioApi';
 import type { PortfolioData, Instrument, TierType } from '../lib/mockPortfolioApi';
-import { Shield, TrendingUp, AlertTriangle, ArrowUpRight, ArrowDownRight, ArrowLeft } from 'lucide-react';
+import { Shield, TrendingUp, AlertTriangle, ArrowUpRight, ArrowDownRight, ArrowLeft, Landmark, Building, Sprout, Briefcase } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import { useNavigate } from 'react-router-dom';
 
@@ -142,6 +142,11 @@ export function InvestmentDistrict() {
       exit={{ opacity: 0 }}
       className="max-w-4xl mx-auto pb-32"
     >
+      {/* Background Watermark */}
+      <div className="fixed bottom-0 right-0 opacity-5 pointer-events-none -z-10 overflow-hidden translate-x-1/4 translate-y-1/4">
+        <Landmark className="w-[600px] h-[600px] text-[#3E2723]" />
+      </div>
+
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
         <div className="flex items-center space-x-4">
@@ -152,38 +157,35 @@ export function InvestmentDistrict() {
             <ArrowLeft className="w-6 h-6" />
           </button>
           <div>
-            <h1 className="text-3xl md:text-4xl font-display font-black text-text-primary">Investment District</h1>
-            <p className="text-text-secondary font-medium mt-1">Build your wealth across different risk tiers.</p>
+            <h1 className="medieval-wood-plaque px-6 py-2 rounded-xl text-3xl md:text-4xl font-display font-black tracking-widest uppercase shadow-lg inline-block">Investment District</h1>
+            <p className="text-[#E8DFCD] font-medium mt-2 drop-shadow-md">Build your wealth across different risk tiers.</p>
           </div>
         </div>
-        <div className="bg-surface px-6 py-3 rounded-2xl shadow-sm border-2 border-border/50 text-right">
-          <div className="text-xs font-bold text-text-secondary uppercase tracking-wider">Total Portfolio</div>
-          <div className="text-2xl font-black text-primary">₹{portfolio.totalNetWorth.toLocaleString()}</div>
+        <div className="medieval-wood-plaque px-6 py-3 rounded-2xl shadow-lg border-[3px] border-[#271510] text-right">
+          <div className="text-xs font-black text-[#F4E4BC] uppercase tracking-wider opacity-80">Total Portfolio</div>
+          <div className="text-2xl font-black text-[#FFD13B] drop-shadow-sm">₹{portfolio.totalNetWorth.toLocaleString()}</div>
         </div>
       </div>
 
       {/* Tabs */}
-      <div className="flex space-x-2 md:space-x-4 mb-8 bg-surface p-2 rounded-2xl shadow-sm overflow-x-auto">
+      <div className="flex space-x-2 md:space-x-4 mb-8 bg-[#E8DFCD] border-2 border-[#8D6E63]/50 p-2 rounded-2xl shadow-inner overflow-x-auto">
         <TabButton 
           active={activeTab === 'foundation'} 
           onClick={() => setActiveTab('foundation')}
           icon={<Shield className="w-5 h-5" />}
           label="Foundation"
-          color="blue"
         />
         <TabButton 
           active={activeTab === 'growth'} 
           onClick={() => setActiveTab('growth')}
           icon={<TrendingUp className="w-5 h-5" />}
           label="Growth"
-          color="green"
         />
         <TabButton 
           active={activeTab === 'sandbox'} 
           onClick={() => setActiveTab('sandbox')}
           icon={<AlertTriangle className="w-5 h-5" />}
           label="High-Risk Sandbox"
-          color="gray"
         />
       </div>
 
@@ -217,32 +219,32 @@ export function InvestmentDistrict() {
               onClick={e => e.stopPropagation()}
             >
               <div className="flex justify-between items-start mb-2">
-                <h2 className="text-2xl font-black text-text-primary">{selectedInstrument.instrument.name}</h2>
-                <Button variant="ghost" className="h-8 w-8 p-0 rounded-full" onClick={() => setSelectedInstrument(null)}>
+                <h2 className="text-2xl font-black text-[#3E2723] uppercase tracking-wide">{selectedInstrument.instrument.name}</h2>
+                <Button variant="ghost" className="h-8 w-8 p-0 rounded-full text-[#3E2723]" onClick={() => setSelectedInstrument(null)}>
                   <ArrowLeft className="w-4 h-4 rotate-180" />
                 </Button>
               </div>
               
-              <p className="text-text-secondary font-medium mb-6">Enter an amount to invest or withdraw.</p>
+              <p className="text-[#5D4037] font-medium mb-6">Enter an amount to invest or withdraw.</p>
               
               <div className="flex gap-4 mb-6">
-                <div className="bg-background rounded-xl p-4 flex-1 border-2 border-border/50">
-                  <div className="text-xs font-bold text-text-secondary uppercase mb-1">Available Cash</div>
+                <div className="bg-[#E8DFCD] rounded-xl p-4 flex-1 border-2 border-[#8D6E63]/50 shadow-inner">
+                  <div className="text-xs font-black text-[#8D6E63] uppercase tracking-wider mb-1">Available Cash</div>
                   <div className="font-black text-success text-xl">₹{money.toLocaleString()}</div>
                 </div>
-                <div className="bg-background rounded-xl p-4 flex-1 border-2 border-border/50">
-                  <div className="text-xs font-bold text-text-secondary uppercase mb-1">Current Value</div>
+                <div className="bg-[#E8DFCD] rounded-xl p-4 flex-1 border-2 border-[#8D6E63]/50 shadow-inner">
+                  <div className="text-xs font-black text-[#8D6E63] uppercase tracking-wider mb-1">Current Value</div>
                   <div className="font-black text-primary text-xl">₹{selectedInstrument.instrument.currentValue.toLocaleString()}</div>
                 </div>
               </div>
 
               <div className="mb-6">
-                <label className="block text-sm font-bold text-text-secondary uppercase tracking-wider mb-2">Amount (₹)</label>
+                <label className="block text-sm font-black text-[#5D4037] uppercase tracking-wider mb-2">Amount (₹)</label>
                 <input 
                   type="number"
                   value={investAmount}
                   onChange={e => setInvestAmount(e.target.value)}
-                  className="w-full bg-surface-alt border-2 border-border rounded-xl px-4 py-3 font-bold text-lg focus:outline-none focus:border-primary text-text-primary"
+                  className="w-full bg-[#FFFAEE] border-4 border-[#8D6E63] rounded-xl px-4 py-3 font-bold text-lg focus:outline-none focus:border-primary text-[#3E2723]"
                   placeholder="e.g. 5000"
                 />
                 {investError && <p className="text-danger text-sm font-bold mt-2">{investError}</p>}
@@ -264,20 +266,14 @@ export function InvestmentDistrict() {
   );
 }
 
-function TabButton({ active, onClick, icon, label, color }: { active: boolean, onClick: () => void, icon: React.ReactNode, label: string, color: 'blue' | 'green' | 'gray' }) {
-  let colorClasses = '';
-  if (color === 'blue') {
-    colorClasses = active ? 'bg-blue-500 text-white shadow-md' : 'text-text-secondary hover:bg-blue-50 hover:text-blue-600';
-  } else if (color === 'green') {
-    colorClasses = active ? 'bg-primary text-white shadow-md' : 'text-text-secondary hover:bg-green-50 hover:text-primary';
-  } else if (color === 'gray') {
-    colorClasses = active ? 'bg-slate-700 text-white shadow-md' : 'text-text-secondary hover:bg-slate-100 hover:text-slate-700';
-  }
+function TabButton({ active, onClick, icon, label }: { active: boolean, onClick: () => void, icon: React.ReactNode, label: string }) {
+  const activeClass = "medieval-wood-plaque shadow-md scale-[1.02] border-[#271510]";
+  const inactiveClass = "text-[#5D4037] bg-[#F4E4BC]/50 hover:bg-[#F4E4BC] border-2 border-[#8D6E63]/30 shadow-sm";
 
   return (
     <button 
       onClick={onClick}
-      className={`flex-1 flex items-center justify-center space-x-2 py-3 px-4 rounded-xl font-bold transition-all ${colorClasses}`}
+      className={`flex-1 flex items-center justify-center space-x-2 py-3 px-4 rounded-xl font-black uppercase tracking-wider transition-all duration-300 ${active ? activeClass : inactiveClass}`}
     >
       {icon}
       <span className="whitespace-nowrap">{label}</span>
@@ -294,8 +290,15 @@ function InstrumentCard({ instrument, tier, onClick }: { instrument: Instrument,
   // De-emphasize Sandbox visually
   const isSandbox = tier === 'sandbox';
   const cardStyles = isSandbox 
-    ? "bg-slate-100 border-2 border-slate-300 shadow-sm opacity-90 grayscale-[0.2]"
-    : "bg-surface border-4 border-border shadow-md hover:border-primary/50 transition-colors";
+    ? "bg-[#D2C4A7] border-4 border-[#8D6E63]/50 shadow-sm opacity-90 grayscale-[0.2]"
+    : "medieval-parchment hover:border-[#5D4037]";
+
+  const getInstrumentIcon = () => {
+    if (instrument.name.includes("Fixed Deposit")) return <Building className="w-8 h-8 text-[#8D6E63] shrink-0" />;
+    if (instrument.name.includes("Index") || instrument.name.includes("Mutual")) return <Sprout className="w-8 h-8 text-[#8D6E63] shrink-0" />;
+    if (instrument.type === "stock") return <TrendingUp className="w-8 h-8 text-[#8D6E63] shrink-0" />;
+    return <Briefcase className="w-8 h-8 text-[#8D6E63] shrink-0" />;
+  };
 
   return (
     <div 
@@ -317,7 +320,10 @@ function InstrumentCard({ instrument, tier, onClick }: { instrument: Instrument,
             <span className="text-xs font-bold text-slate-500 capitalize bg-slate-200 px-2 py-1 rounded-md">Volatility: {instrument.volatility}</span>
           )}
         </div>
-        <h3 className={`text-xl font-black ${isSandbox ? 'text-slate-700' : 'text-text-primary'}`}>{instrument.name}</h3>
+        <div className="flex items-center space-x-4 mt-3">
+          {getInstrumentIcon()}
+          <h3 className={`text-xl font-black ${isSandbox ? 'text-slate-700' : 'text-text-primary'}`}>{instrument.name}</h3>
+        </div>
       </div>
 
       <div className="flex items-center justify-between md:justify-end md:space-x-8">

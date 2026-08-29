@@ -61,6 +61,7 @@ type GameState = {
   updateNetWorth: (delta: number) => void;
   showToast: (title: string, message: string, type?: ToastMessage['type']) => void;
   removeToast: (id: string) => void;
+  isLoadingAuth: boolean;
 };
 
 const GameStateContext = createContext<GameState | undefined>(undefined);
@@ -74,6 +75,7 @@ export const GameStateProvider = ({ children }: { children: ReactNode }) => {
   const [health, setHealth] = useState(78);
   const [streakDays, setStreakDays] = useState(12);
   const [netWorth, setNetWorth] = useState(248500);
+  const [isLoadingAuth, setIsLoadingAuth] = useState(true);
 
   // Sync from backend
   const syncState = async () => {
@@ -97,6 +99,8 @@ export const GameStateProvider = ({ children }: { children: ReactNode }) => {
       }
     } catch (e) {
       console.error("Failed to sync state from backend", e);
+    } finally {
+      setIsLoadingAuth(false);
     }
   };
 
@@ -286,6 +290,7 @@ export const GameStateProvider = ({ children }: { children: ReactNode }) => {
         updateMoney,
         showToast,
         removeToast,
+        isLoadingAuth,
       }}
     >
       {children}
