@@ -15,7 +15,17 @@ router.post('/login', async (req, res) => {
     const user = await getAsync('SELECT * FROM users WHERE id = ? AND role = ?', [cleanedId, 'admin']);
     if (!user) return res.status(401).json({ error: 'Invalid credentials' });
 
-    const isValid = await bcrypt.compare(password, user.password);
+    let isValid = false;
+    if (user.password && user.password.startsWith('$2')) {
+      isValid = await bcrypt.compare(password, user.password);
+    } else {
+      isValid = (password === user.password);
+      if (isValid) {
+        // Upgrade password to hash
+        const hashed = await bcrypt.hash(password, 10);
+        await runAsync('UPDATE users SET password = ? WHERE id = ?', [hashed, user.id]);
+      }
+    }
     if (!isValid) return res.status(401).json({ error: 'Invalid credentials' });
 
     const token = generateToken(user.id, user.role);

@@ -170,7 +170,7 @@ export const GameStateProvider = ({ children }: { children: ReactNode }) => {
   const districts = useMemo<District[]>(() => [
     { id: 'study', name: 'Study 🎓', description: 'Understand money. Make smarter decisions. Build your world.', progress: '0%', reward: '+XP', path: '/study', locked: false, marketValue: '₹0' },
     { id: 'academy', name: 'Fin Academy', description: 'Learn how money works.', progress: '80%', reward: '+250 XP', path: '/academy', locked: false, marketValue: '₹4.2M' },
-    { id: 'investment', name: 'Investment District', description: 'Grow your wealth through smart decisions.', progress: '20%', reward: '+500 XP', path: '/investment', locked: false, marketValue: '₹12.5M' },
+    { id: 'investment', name: 'Investment District', description: 'Grow your wealth through smart decisions.', progress: level >= 20 ? '20%' : 'Locked', reward: level >= 20 ? '+500 XP' : 'Level 20 Req', path: '/investment', locked: level < 20, marketValue: '₹12.5M' },
     { id: 'market', name: 'Market City', description: 'Experience supply, demand, and economics.', progress: level >= 20 ? 'Active' : 'Locked', reward: 'Level 20 Req', path: '/market', locked: level < 20, marketValue: '₹8.9M' },
     { id: 'life', name: 'Life Hub', description: 'Build your life, set goals, and thrive.', progress: '50%', reward: '+100 XP', path: '/life', locked: false, marketValue: '₹1.1M' },
     { id: 'security', name: 'Security Center', description: 'Spot frauds, earn badges, stay safe.', progress: '0%', reward: 'Fraud Spotter Badge', path: '/security', locked: false, marketValue: '₹500K' },

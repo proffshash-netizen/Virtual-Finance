@@ -9,7 +9,13 @@ import { useNavigate } from 'react-router-dom';
 
 export function InvestmentDistrict() {
   const navigate = useNavigate();
-  const { user, money, updateMoney, updateNetWorth } = useGameState();
+  const { user, money, updateMoney, updateNetWorth, level } = useGameState();
+
+  useEffect(() => {
+    if (level < 20) {
+      navigate('/world', { replace: true });
+    }
+  }, [level, navigate]);
   const [portfolio, setPortfolio] = useState<PortfolioData | null>(null);
   const [activeTab, setActiveTab] = useState<TierType>('foundation');
   const [loading, setLoading] = useState(true);

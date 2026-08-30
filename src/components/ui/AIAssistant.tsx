@@ -1,7 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { MessageSquare, X, Send, Bot } from 'lucide-react';
-import { useLocation } from 'react-router-dom';
 
 interface Message {
   id: string;
@@ -17,7 +16,6 @@ export function AIAssistant() {
   const [inputValue, setInputValue] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const location = useLocation();
 
   const [hasUnread, setHasUnread] = useState(true);
   

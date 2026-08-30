@@ -15,7 +15,17 @@ router.post('/login', async (req, res) => {
     const user = await getAsync('SELECT * FROM users WHERE id = ? AND role = ?', [uppercaseId, 'player']);
     if (!user) return res.status(401).json({ error: 'Invalid credentials' });
 
-    const isValid = await bcrypt.compare(password, user.password);
+    let isValid = false;
+    if (user.password && user.password.startsWith('$2')) {
+      isValid = await bcrypt.compare(password, user.password);
+    } else {
+      isValid = (password === user.password);
+      if (isValid) {
+        // Upgrade password to hash
+        const hashed = await bcrypt.hash(password, 10);
+        await runAsync('UPDATE users SET password = ? WHERE id = ?', [hashed, user.id]);
+      }
+    }
     if (!isValid) return res.status(401).json({ error: 'Invalid credentials' });
 
     const token = generateToken(user.id, user.role, '30d');
@@ -49,7 +59,14 @@ router.post('/register', async (req, res) => {
   if (!displayName || !email || !password) return res.status(400).json({ error: 'Missing fields' });
 
   try {
-    const newUserId = 'FIN' + Math.floor(Math.random() * 10000).toString().padStart(4, '0');
+    let newUserId;
+    let exists = true;
+    while (exists) {
+      newUserId = 'FIN' + Math.floor(Math.random() * 10000).toString().padStart(4, '0');
+      const checkUser = await getAsync('SELECT id FROM users WHERE id = ?', [newUserId]);
+      if (!checkUser) exists = false;
+    }
+    
     const hashedPassword = await bcrypt.hash(password, 10);
     
     await runAsync(`INSERT INTO users (id, password, role, display_name, email, avatar_id, level, xp, money, net_worth, health, streak_days, achievements, unlocked_districts) 

@@ -1,9 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useLocation, useNavigate, useOutlet } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Bell, TrendingUp, X, Heart, Flame, LogOut, Coins, Gem, Star } from 'lucide-react';
+import { Bell, X, LogOut, Star } from 'lucide-react';
 import { useGameState } from '../../lib/gameState';
-import { AnimatedNumber } from '../ui/AnimatedNumber';
 import { FinlitIcon } from '../ui/FinlitIcon';
 import { WorldInteractionRipple } from '../ui/WorldInteractionRipple';
 import { MoneyBirdLayer } from './MoneyBirdLayer';
@@ -14,7 +13,7 @@ export function GlobalLayout() {
   const location = useLocation();
   const navigate = useNavigate();
   const isWorldMap = location.pathname === '/world' || location.pathname === '/world-3d';
-  const { user, logout, level, xp, nextLevelXp, health, money, netWorth, streakDays, toasts, removeToast, showToast } = useGameState();
+  const { user, logout, toasts, removeToast, showToast } = useGameState();
   const outlet = useOutlet();
   const [isTransitioning, setIsTransitioning] = useState(false);
 
@@ -38,7 +37,6 @@ export function GlobalLayout() {
     return () => window.removeEventListener('trigger-transition', handleTransition);
   }, [navigate]);
 
-  const xpProgress = (xp / nextLevelXp) * 100;
 
   return (
     <div className="h-[100dvh] w-full bg-gradient-to-b from-[#1C2C16] via-[#2F4827] to-[#4A6741] flex flex-col text-text-primary overflow-hidden relative">
