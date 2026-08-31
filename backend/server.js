@@ -32,9 +32,16 @@ app.use(cors({
 }));
 
 // Routes
+const portfolioRoutes = require('./routes/portfolio');
+const securityRoutes = require('./routes/security');
+const socialRoutes = require('./routes/social');
+
 app.use('/api/admin', adminRoutes);
 app.use('/api/player', playerRoutes);
 app.use('/api/guide', guideRoutes);
+app.use('/api/portfolio', portfolioRoutes);
+app.use('/api/security-scenarios', securityRoutes);
+app.use('/api', socialRoutes); // handles /api/badges and /api/leaderboard
 
 // Health check
 app.get('/api/health', (req, res) => {

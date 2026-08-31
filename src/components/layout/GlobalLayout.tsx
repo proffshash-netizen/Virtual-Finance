@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useLocation, useNavigate, useOutlet } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Bell, X, LogOut, Star } from 'lucide-react';
+import { Bell, X, LogOut, Star, Settings, Home } from 'lucide-react';
 import { useGameState } from '../../lib/gameState';
 import { FinlitIcon } from '../ui/FinlitIcon';
 import { WorldInteractionRipple } from '../ui/WorldInteractionRipple';
@@ -85,6 +85,20 @@ export function GlobalLayout() {
 
         {/* Actions Sibling */}
         <div className="flex items-center gap-3 pointer-events-auto shrink-0">
+          <button 
+            className="w-10 md:w-12 h-10 md:h-12 rounded-full medieval-wood-plaque flex items-center justify-center hover:brightness-110 hover:scale-105 active:scale-95 transition-all relative group shrink-0"
+            onClick={() => navigate('/world')}
+            title="Home"
+          >
+            <Home className="w-5 md:w-6 h-5 md:h-6 drop-shadow-sm" />
+          </button>
+          <button 
+            className="w-10 md:w-12 h-10 md:h-12 rounded-full medieval-wood-plaque flex items-center justify-center hover:brightness-110 hover:scale-105 active:scale-95 transition-all relative group shrink-0"
+            onClick={() => showToast('Settings', 'Settings panel coming soon!', 'info')}
+            title="Settings"
+          >
+            <Settings className="w-5 md:w-6 h-5 md:h-6 drop-shadow-sm" />
+          </button>
           <button 
             className="w-10 md:w-12 h-10 md:h-12 rounded-full medieval-wood-plaque flex items-center justify-center hover:brightness-110 hover:scale-105 active:scale-95 transition-all relative group shrink-0"
             onClick={() => showToast('New Market Event', 'Inflation data has been released', 'info')}

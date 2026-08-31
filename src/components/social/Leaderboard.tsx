@@ -69,13 +69,14 @@ export function Leaderboard() {
                 </div>
               </div>
             </div>
-            
             <div className="text-right">
               <div className="text-sm font-black text-success">
-                ₹{player.netWorth.toLocaleString()}
+                {typeof player.metricValue === 'number' && player.metricLabel.includes('Worth') 
+                  ? `₹${player.metricValue.toLocaleString()}` 
+                  : player.metricValue}
               </div>
               <div className="text-[10px] font-bold text-text-secondary uppercase tracking-widest">
-                Net Worth
+                {player.metricLabel}
               </div>
             </div>
           </motion.div>

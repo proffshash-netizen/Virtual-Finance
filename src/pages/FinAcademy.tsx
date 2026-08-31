@@ -13,7 +13,7 @@ type MissionState = 'idle' | 'intro' | 'scenario' | 'analyzing' | 'reward';
 export function FinAcademy() {
   const [missionState, setMissionState] = useState<MissionState>('idle');
   const [selectedOption, setSelectedOption] = useState<number | null>(null);
-  const { completeMission, level, xp, streakDays } = useGameState();
+  const { completeMission, level, xp, streakDays, districts } = useGameState();
   const navigate = useNavigate();
 
   const roadmapNodes = [
@@ -37,8 +37,15 @@ export function FinAcademy() {
 
   const finishMission = () => {
     completeMission('inflation');
-    // Go to Market City and trigger the inflation event
-    navigate('/market', { state: { triggerEvent: 'inflation' } });
+    
+    const marketDistrict = districts.find(d => d.id === 'market');
+    if (marketDistrict && !marketDistrict.locked) {
+      // Go to Market City and trigger the inflation event
+      navigate('/market', { state: { triggerEvent: 'inflation' } });
+    } else {
+      // Return to world map since Market City is locked
+      navigate('/world');
+    }
   };
 
   return (

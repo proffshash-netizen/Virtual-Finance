@@ -1,5 +1,5 @@
 const express = require('express');
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs');
 const { getAsync, runAsync } = require('../db');
 const { generateToken, authMiddleware } = require('../auth');
 
@@ -11,21 +11,32 @@ router.post('/login', async (req, res) => {
   if (!userId || !password) return res.status(400).json({ error: 'Missing credentials' });
 
   try {
+    if (typeof userId !== 'string' || typeof password !== 'string') {
+      return res.status(400).json({ error: 'Invalid credential format' });
+    }
+
     const uppercaseId = userId.trim().toUpperCase();
     const user = await getAsync('SELECT * FROM users WHERE id = ? AND role = ?', [uppercaseId, 'player']);
     if (!user) return res.status(401).json({ error: 'Invalid credentials' });
 
     let isValid = false;
-    if (user.password && user.password.startsWith('$2')) {
-      isValid = await bcrypt.compare(password, user.password);
+    const dbPassword = user.password ? String(user.password) : '';
+
+    if (dbPassword.startsWith('$2')) {
+      isValid = await bcrypt.compare(password, dbPassword);
     } else {
-      isValid = (password === user.password);
+      isValid = (password === dbPassword);
       if (isValid) {
-        // Upgrade password to hash
-        const hashed = await bcrypt.hash(password, 10);
-        await runAsync('UPDATE users SET password = ? WHERE id = ?', [hashed, user.id]);
+        try {
+          // Upgrade password to hash
+          const hashed = await bcrypt.hash(password, 10);
+          await runAsync('UPDATE users SET password = ? WHERE id = ?', [hashed, user.id]);
+        } catch (hashErr) {
+          console.error('Password hash upgrade failed:', hashErr);
+        }
       }
     }
+    
     if (!isValid) return res.status(401).json({ error: 'Invalid credentials' });
 
     const token = generateToken(user.id, user.role, '30d');
@@ -36,10 +47,10 @@ router.post('/login', async (req, res) => {
       maxAge: 30 * 24 * 3600000 // 30 days for player
     });
 
-    res.json({ success: true, user: { userId: user.id, displayName: user.display_name, email: user.email, avatarId: user.avatar_id } });
+    return res.json({ success: true, user: { userId: user.id, displayName: user.display_name, email: user.email, avatarId: user.avatar_id } });
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: 'Internal server error' });
+    console.error('Player login error:', error);
+    return res.status(500).json({ error: 'Internal server error' });
   }
 });
 
@@ -55,20 +66,21 @@ router.post('/logout', (req, res) => {
 
 // Player Register
 router.post('/register', async (req, res) => {
-  const { displayName, email, password } = req.body;
-  if (!displayName || !email || !password) return res.status(400).json({ error: 'Missing fields' });
+  const { displayName, email, password, ageConfirmation } = req.body;
+  if (!displayName || !email || !password || ageConfirmation !== true) {
+    return res.status(400).json({ error: 'Missing fields or age not confirmed' });
+  }
+
+  if (password.length < 8) {
+    return res.status(400).json({ error: 'Password must be at least 8 characters' });
+  }
 
   try {
-    let newUserId;
-    let exists = true;
-    while (exists) {
-      newUserId = 'FIN' + Math.floor(Math.random() * 10000).toString().padStart(4, '0');
-      const checkUser = await getAsync('SELECT id FROM users WHERE id = ?', [newUserId]);
-      if (!checkUser) exists = false;
-    }
-    
+    const newUserId = 'FIN' + Math.floor(Math.random() * 10000).toString().padStart(4, '0');
     const hashedPassword = await bcrypt.hash(password, 10);
     
+    // We rely on the UNIQUE constraint on email here.
+    // If it violates, Postgres will throw a unique_violation error (code 23505)
     await runAsync(`INSERT INTO users (id, password, role, display_name, email, avatar_id, level, xp, money, net_worth, health, streak_days, achievements, unlocked_districts) 
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
         [newUserId, hashedPassword, 'player', displayName, email, 'avatar_01', 1, 0, 10000, 10000, 100, 0, '[]', '["study"]']
@@ -85,6 +97,9 @@ router.post('/register', async (req, res) => {
     res.json({ success: true, user: { userId: newUserId, displayName, email, avatarId: 'avatar_01' } });
   } catch (error) {
     console.error(error);
+    if (error.code === '23505') {
+      return res.status(400).json({ error: 'Email already exists' });
+    }
     res.status(500).json({ error: 'Internal server error' });
   }
 });
