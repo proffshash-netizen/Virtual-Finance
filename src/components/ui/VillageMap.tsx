@@ -29,7 +29,7 @@ export function VillageMap({ mini = false, onLocationClick, setActiveHover }: Vi
         <img 
           src="/map_artwork_modern.jpg" 
           className="w-full h-auto block pointer-events-none"
-          style={{ imageRendering: 'high-quality', filter: 'contrast(1.15) saturate(1.2) brightness(1.05) drop-shadow(0 0 10px rgba(0,0,0,0.5))' }}
+          style={{ imageRendering: 'auto', filter: 'contrast(1.15) saturate(1.2) brightness(1.05) drop-shadow(0 0 10px rgba(0,0,0,0.5))' }}
           alt="FinLit City Map" 
         />
         
