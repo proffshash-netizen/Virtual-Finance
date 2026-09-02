@@ -95,8 +95,6 @@ router.put('/players/:id', authMiddleware('admin'), async (req, res) => {
   const updates = req.body;
   
   const allowedFields = ['xp', 'level', 'money', 'net_worth', 'health', 'streak_days'];
-  const stringFields = ['avatar_id']; // if needed
-  
   try {
     const player = await getAsync('SELECT * FROM users WHERE id = ? AND role = ?', [targetId, 'player']);
     if (!player) return res.status(404).json({ error: 'Player not found' });

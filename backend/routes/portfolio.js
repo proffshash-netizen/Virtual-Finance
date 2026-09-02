@@ -1,5 +1,5 @@
 const express = require('express');
-const { getAsync, allAsync, runAsync, pool } = require('../db');
+const { getAsync, allAsync, pool } = require('../db');
 const { authMiddleware } = require('../auth');
 
 const router = express.Router();
@@ -142,7 +142,7 @@ router.post('/invest', authMiddleware('player'), async (req, res) => {
 
 // POST /api/portfolio/withdraw
 router.post('/withdraw', authMiddleware('player'), async (req, res) => {
-  const { tier, instrumentId, amount } = req.body;
+  const { instrumentId, amount } = req.body;
   if (!instrumentId || !amount || amount <= 0) {
     return res.status(400).json({ error: 'Invalid withdrawal details' });
   }

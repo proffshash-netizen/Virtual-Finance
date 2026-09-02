@@ -3,7 +3,6 @@ import { OrbitControls } from '@react-three/drei';
 import { Terrain } from './Terrain';
 import { DistrictNode } from './DistrictNode';
 import { Train } from './Train';
-import { AmbientCharacters } from './AmbientCharacters';
 import { useGameState } from '../../lib/gameState';
 
 interface SceneProps {
@@ -60,7 +59,6 @@ export function Scene({ onLocationClick }: SceneProps) {
       <group>
         <Terrain />
         <Train />
-        <AmbientCharacters />
         
         {districts.map(d => {
           const layout = districtLayout[d.id as keyof typeof districtLayout];

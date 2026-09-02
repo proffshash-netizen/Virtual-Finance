@@ -1,5 +1,5 @@
 const express = require('express');
-const { getAsync, allAsync } = require('../db');
+const { allAsync } = require('../db');
 const { authMiddleware } = require('../auth');
 
 const router = express.Router();

@@ -53,56 +53,7 @@ export function VillageMap({ mini = false, onLocationClick, setActiveHover }: Vi
           </div>
         )}
 
-      {/* 1.5 Ambient Life Layer */}
-      {!mini && (
-        <div className="absolute inset-0 pointer-events-none z-[5]">
-          {/* 1. Fin Academy Student (Idling) */}
-          <div className="absolute animate-bob" style={{ left: '60%', top: '22%' }}>
-            <div className="relative text-3xl drop-shadow-[0_4px_4px_rgba(0,0,0,0.5)]">
-              🧑‍🎓
-            </div>
-          </div>
 
-          {/* 2. Market Shopper (Walking) */}
-          <div className="absolute" style={{ left: '55%', top: '55%' }}>
-            <div className="animate-walk">
-              <div className="relative text-3xl drop-shadow-[0_4px_4px_rgba(0,0,0,0.5)]">
-                🛍️
-              </div>
-            </div>
-          </div>
-
-          {/* 3. Investment Banker (Idling) */}
-          <div className="absolute animate-bob" style={{ left: '72%', top: '38%', animationDelay: '0.5s' }}>
-            <div className="relative text-3xl drop-shadow-[0_4px_4px_rgba(0,0,0,0.5)]">
-              👩‍💼
-            </div>
-          </div>
-
-          {/* 4. Village Dog (Sleeping/Bobbing) */}
-          <div className="absolute animate-bob" style={{ left: '50%', top: '42%', animationDuration: '3s' }}>
-            <div className="relative text-2xl drop-shadow-[0_4px_4px_rgba(0,0,0,0.5)] flex items-end">
-              🐕
-            </div>
-          </div>
-
-          {/* 5. Wandering Villager (Walking) */}
-          <div className="absolute" style={{ left: '40%', top: '65%' }}>
-            <div className="animate-walk" style={{ animationDuration: '12s', animationDelay: '2s' }}>
-              <div className="relative text-3xl drop-shadow-[0_4px_4px_rgba(0,0,0,0.5)]">
-                🧓
-              </div>
-            </div>
-          </div>
-
-          {/* 6. Hopping Sparrow (Bobbing Fast) */}
-          <div className="absolute animate-bob" style={{ left: '42%', top: '25%', animationDuration: '0.8s' }}>
-            <div className="relative text-xl drop-shadow-[0_4px_4px_rgba(0,0,0,0.5)]">
-              🐦
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* 2. Hotspot Overlay */}
       <div className="absolute inset-0 pointer-events-none z-10">
@@ -120,7 +71,7 @@ export function VillageMap({ mini = false, onLocationClick, setActiveHover }: Vi
         >
           {/* Scout Regiment Flag & Label */}
           <motion.div 
-            whileTap={{ scale: 0.9 }}
+
             onClick={(e) => { e.stopPropagation(); handleClick('academy'); }}
             className="absolute bottom-1/2 left-1/2 -translate-x-1/2 flex flex-col items-center group cursor-pointer origin-bottom"
           >
@@ -148,7 +99,7 @@ export function VillageMap({ mini = false, onLocationClick, setActiveHover }: Vi
           onClick={() => handleClick('market')}
         >
           <motion.div 
-            whileTap={{ scale: 0.9 }}
+
             onClick={(e) => { e.stopPropagation(); handleClick('market'); }}
             className="absolute bottom-1/2 left-1/2 -translate-x-1/2 flex flex-col items-center group cursor-pointer origin-bottom"
           >
@@ -176,7 +127,7 @@ export function VillageMap({ mini = false, onLocationClick, setActiveHover }: Vi
           onClick={() => handleClick('investment')}
         >
           <motion.div 
-            whileTap={{ scale: 0.9 }}
+
             onClick={(e) => { e.stopPropagation(); handleClick('investment'); }}
             className="absolute bottom-1/2 left-1/2 -translate-x-1/2 flex flex-col items-center group cursor-pointer origin-bottom"
           >
@@ -204,7 +155,7 @@ export function VillageMap({ mini = false, onLocationClick, setActiveHover }: Vi
           onClick={() => handleClick('life')}
         >
           <motion.div 
-            whileTap={{ scale: 0.9 }}
+
             onClick={(e) => { e.stopPropagation(); handleClick('life'); }}
             className="absolute bottom-1/2 left-1/2 -translate-x-1/2 flex flex-col items-center group cursor-pointer origin-bottom"
           >
@@ -232,7 +183,7 @@ export function VillageMap({ mini = false, onLocationClick, setActiveHover }: Vi
           onClick={() => handleClick('security')}
         >
           <motion.div 
-            whileTap={{ scale: 0.9 }}
+
             onClick={(e) => { e.stopPropagation(); handleClick('security'); }}
             className="absolute bottom-1/2 left-1/2 -translate-x-1/2 flex flex-col items-center group cursor-pointer origin-bottom"
           >
@@ -260,7 +211,7 @@ export function VillageMap({ mini = false, onLocationClick, setActiveHover }: Vi
           onClick={() => handleClick('social')}
         >
           <motion.div 
-            whileTap={{ scale: 0.9 }}
+
             onClick={(e) => { e.stopPropagation(); handleClick('social'); }}
             className="absolute bottom-1/2 left-1/2 -translate-x-1/2 flex flex-col items-center group cursor-pointer origin-bottom"
           >

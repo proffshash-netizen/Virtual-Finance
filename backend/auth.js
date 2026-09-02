@@ -24,7 +24,7 @@ const authMiddleware = (requiredRole = null) => {
 
       req.user = decoded;
       next();
-    } catch (err) {
+    } catch {
       return res.status(401).json({ error: 'Unauthorized: Invalid or expired session' });
     }
   };

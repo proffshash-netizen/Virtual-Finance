@@ -35,7 +35,7 @@ export function AdminLogin() {
       } else {
         setError(data.error || 'Authentication failed');
       }
-    } catch (err) {
+    } catch {
       setError('Connection to secure server failed');
     } finally {
       setLoading(false);

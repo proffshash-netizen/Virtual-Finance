@@ -48,7 +48,7 @@ export function PlayerControlPanel() {
       } else {
         setErrorMsg(data.error || 'Failed to update');
       }
-    } catch (e) {
+    } catch {
       setErrorMsg('Connection error');
     } finally {
       setSaving(false);

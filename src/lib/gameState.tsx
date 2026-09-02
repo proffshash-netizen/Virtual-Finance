@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components */
 import { createContext, useContext, useState, useEffect, useMemo, useRef } from 'react';
 import type { ReactNode } from 'react';
 
@@ -147,7 +148,7 @@ export const GameStateProvider = ({ children }: { children: ReactNode }) => {
   const logout = async () => {
     try {
       await fetch('/api/player/logout', { method: 'POST' });
-    } catch (e) {}
+    } catch {}
     setUser(null);
   };
 

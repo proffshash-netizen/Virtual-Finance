@@ -6,7 +6,7 @@ const pool = new Pool({
 });
 
 // Prevent Node.js from crashing on idle client errors
-pool.on('error', (err, client) => {
+pool.on('error', (err, _client) => {
   console.error('Unexpected error on idle client', err);
 });
 
@@ -55,7 +55,7 @@ const initDb = async () => {
         unlocked_districts TEXT
       )
     `);
-    try { await runAsync(`ALTER TABLE users ADD CONSTRAINT users_email_key UNIQUE (email)`); } catch (e) {}
+    try { await runAsync(`ALTER TABLE users ADD CONSTRAINT users_email_key UNIQUE (email)`); } catch {}
 
     // 2. Create audit logs table
     await runAsync(`
@@ -94,7 +94,7 @@ const initDb = async () => {
         invested_at TIMESTAMPTZ NOT NULL DEFAULT now()
       )
     `);
-    try { await runAsync(`CREATE INDEX idx_player_investments_user ON player_investments(user_id)`); } catch (e) {}
+    try { await runAsync(`CREATE INDEX idx_player_investments_user ON player_investments(user_id)`); } catch {}
 
     // 4. Create Security Scenarios tables
     await runAsync(`
@@ -120,7 +120,7 @@ const initDb = async () => {
         attempted_at TIMESTAMPTZ NOT NULL DEFAULT now()
       )
     `);
-    try { await runAsync(`CREATE INDEX idx_scenario_attempts_user ON player_scenario_attempts(user_id)`); } catch (e) {}
+    try { await runAsync(`CREATE INDEX idx_scenario_attempts_user ON player_scenario_attempts(user_id)`); } catch {}
 
     // 5. Create Badges & Leaderboard tables
     await runAsync(`
@@ -150,7 +150,7 @@ const initDb = async () => {
         recorded_at TIMESTAMPTZ NOT NULL DEFAULT now()
       )
     `);
-    try { await runAsync(`CREATE INDEX idx_net_worth_history_user ON net_worth_history(user_id, recorded_at)`); } catch (e) {}
+    try { await runAsync(`CREATE INDEX idx_net_worth_history_user ON net_worth_history(user_id, recorded_at)`); } catch {}
 
 
     // -- SEEDS --
